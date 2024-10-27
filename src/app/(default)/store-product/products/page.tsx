@@ -1,16 +1,16 @@
-export const metadata = {
-  title: 'Product - Management',
-  description: 'Product - Management',
-};
+"use client";
 
-import { SelectedItemsProvider } from '@/app/selected-items-context';
-import DeleteButton from '@/components/delete-button';
-import DateSelect from '@/components/date-select';
-import FilterButton from '@/components/dropdown-filter';
-import ProductsTable from './products-table';
-import PaginationClassic from '@/components/pagination-classic';
+import { SelectedItemsProvider } from "@/app/selected-items-context";
+import DeleteButton from "@/components/delete-button";
+import DateSelect from "@/components/date-select";
+import FilterButton from "@/components/dropdown-filter";
+import ProductsTable from "./products-table";
+import PaginationClassic from "@/components/pagination-classic";
+import useProducts from "@/hooks/useProducts";
+import Link from "next/link";
 
 function ProductsContent() {
+  const products = useProducts({});
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[96rem] mx-auto">
       {/* Page header */}
@@ -34,7 +34,10 @@ function ProductsContent() {
           <FilterButton align="right" />
 
           {/* Add customer button */}
-          <button className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
+          <Link
+            href={"/store-product/new-product"}
+            className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
+          >
             <svg
               className="fill-current shrink-0 xs:hidden"
               width="16"
@@ -44,12 +47,12 @@ function ProductsContent() {
               <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
             </svg>
             <span className="max-xs:sr-only">Add Product</span>
-          </button>
+          </Link>
         </div>
       </div>
 
       {/* Table */}
-      <ProductsTable customers={customers} />
+      <ProductsTable products={products} />
 
       {/* Pagination */}
       <div className="mt-8">

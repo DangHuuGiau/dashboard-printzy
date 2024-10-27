@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useItemSelection } from '@/components/utils/use-item-selection';
-import ProductsTableItem from './products-table-item';
+import { useItemSelection } from "@/components/utils/use-item-selection";
+import ProductsTableItem from "./products-table-item";
 
 export default function ProductsTable({ products }: { products: any[] }) {
   const {
@@ -15,9 +15,9 @@ export default function ProductsTable({ products }: { products: any[] }) {
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          All products{' '}
+          All products{" "}
           <span className="font-medium text-gray-400 dark:text-gray-500">
-            248
+            {products?.length}
           </span>
         </h2>
       </header>
@@ -42,28 +42,25 @@ export default function ProductsTable({ products }: { products: any[] }) {
                   </div>
                 </th>
                 <th className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <span className="sr-only">Favourite</span>
+                  <span className="sr-only">Image</span>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Order</div>
+                  <div className="font-semibold text-left">Name</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Email</div>
+                  <div className="font-semibold text-left">SKU</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Location</div>
+                  <div className="font-semibold text-left">Category</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold">Orders</div>
+                  <div className="font-semibold">Collection</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Last order</div>
+                  <div className="font-semibold text-left">Price</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Total spent</div>
-                </th>
-                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold">Refunds</div>
+                  <div className="font-semibold text-left">Available</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <span className="sr-only">Menu</span>
