@@ -6,16 +6,35 @@ import CategoryImageUpload from '@/components/categories/category-upload-image';
 import AddProductsModal from '@/components/categories/modal-add-product';
 import ProductsInCategory from '@/components/categories/products-in-category';
 import CKEditorComponent from '@/components/ckeditor-input';
+import useCategory from '@/hooks/useCategory';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
-export default function NewCategory() {
+const SingleCategory = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();
 
+  const category = useCategory(params?.slug);
   const [categoryName, setCategoryName] = useState('');
   const [categoryImage, setCategoryImage] = useState<File | null>(null);
   const [description, setDescription] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (category) {
+      setCategoryName(category.name || '');
+      setDescription(category.description || '');
+      if (category.upload) {
+        setCategoryImage(category.upload.path);
+      }
+      if (category.categoryProducts?.length > 0) {
+        setSelectedProducts(
+          category.categoryProducts.map(
+            (categoryProduct: any) => categoryProduct?.product
+          )
+        );
+      }
+    }
+  }, [category]);
 
   const handleImageUpload = (image: File | null) => {
     setCategoryImage(image);
@@ -33,21 +52,24 @@ export default function NewCategory() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (categoryImage) {
-      const uploadData = await uploadsService.uploadFile(categoryImage);
-      const newCategory = {
+    if (categoryImage && category) {
+      let newCategory: any = {
         name: categoryName,
         description,
-        uploadId: uploadData?.id,
         productIds:
           selectedProducts.length > 0
             ? selectedProducts.map((product) => product.id)
             : null,
       };
-      await categoriesService.create(newCategory);
+      if (categoryImage !== category.upload.path) {
+        const uploadData = await uploadsService.uploadFile(categoryImage);
+        newCategory.uploadId = uploadData?.id;
+      }
+      await categoriesService.update(category.id, newCategory);
       router.push('/store-product/categories');
     }
   };
+
   const handleCancel = () => {
     router.push('/store-product/categories');
   };
@@ -58,7 +80,8 @@ export default function NewCategory() {
         <div className="px-5 py-4 mb-8">
           <div className="flex flex-wrap justify-end space-x-2">
             <button
-              onClick={() => console.log('Cancel')}
+              type="button"
+              onClick={() => handleCancel()}
               className="text-gray-800 border-gray-200 btn-sm dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 dark:text-gray-300"
             >
               Cancel
@@ -71,7 +94,7 @@ export default function NewCategory() {
             </button>
           </div>
         </div>
-        <div className="flex flex-col mx-auto max-w-7xl lg:flex-row lg:space-x-8 xl:space-x-16 ">
+        <div className="flex flex-col max-w-5xl mx-auto lg:flex-row lg:space-x-8 xl:space-x-16 ">
           <div className="w-2/3">
             <div className="p-5 space-y-8 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <h2 className="mb-6 text-2xl font-bold text-gray-800 dark:text-gray-100">
@@ -104,6 +127,7 @@ export default function NewCategory() {
             </div>
           </div>
 
+          {/* Sidebar */}
           <div className="w-1/3">
             <div>
               <div className="p-5 space-y-8 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
@@ -123,6 +147,7 @@ export default function NewCategory() {
                       Category Image
                     </label>
                     <CategoryImageUpload
+                      initImageLink={category?.upload?.path}
                       onImageUpload={handleImageUpload}
                       onDeleteImage={handleDeleteImage}
                     />
@@ -147,6 +172,7 @@ export default function NewCategory() {
 
                   <div className="mt-4">
                     <div>
+                      {/* Start */}
                       <div>
                         <label
                           className="block mb-1 text-sm font-medium"
@@ -159,6 +185,7 @@ export default function NewCategory() {
                           onChange={(value) => setDescription(value)}
                         />
                       </div>
+                      {/* End */}
                     </div>
                   </div>
                 </div>
@@ -169,4 +196,6 @@ export default function NewCategory() {
       </form>
     </div>
   );
-}
+};
+
+export default SingleCategory;

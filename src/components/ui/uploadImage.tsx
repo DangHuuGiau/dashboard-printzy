@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 interface ImageUploadProps {
-  variantIndex: number; // Unique identifier for the variant
+  variantIndex: number;
   onImageUpload: (variantIndex: number, imageUrl: string | null) => void;
-  onDeleteImage: (variantIndex: number) => void; // Callback to notify parent
+  onDeleteImage: (variantIndex: number) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -15,19 +15,19 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
+    if (file && file.type.startsWith('image/')) {
       const imageURL = URL.createObjectURL(file);
       setSelectedImage(imageURL);
       onImageUpload(variantIndex, imageURL);
     } else {
-      alert("Please upload a valid image file");
+      alert('Please upload a valid image file');
     }
   };
 
   return (
     <div className="flex items-center justify-center w-28">
       <label
-        htmlFor={`dropzone-file-${variantIndex}`} // Unique ID for each variant
+        htmlFor={`dropzone-file-${variantIndex}`}
         className="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer h-28 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
         {selectedImage ? (
@@ -68,7 +68,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </div>
         )}
         <input
-          id={`dropzone-file-${variantIndex}`} // Unique ID for each variant
+          id={`dropzone-file-${variantIndex}`}
           type="file"
           accept="image/*"
           className="hidden"

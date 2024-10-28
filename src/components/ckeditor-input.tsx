@@ -1,19 +1,24 @@
-// components/CKEditorComponent.js
-import React, { useState } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import React from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-const CKEditorComponent = () => {
-  const [editorData, setEditorData] = useState("");
+interface CKEditorComponentProps {
+  value: string;
+  onChange: (data: string) => void;
+}
 
+const CKEditorComponent: React.FC<CKEditorComponentProps> = ({
+  value,
+  onChange,
+}) => {
   return (
     <div className="rounded-lg">
       <CKEditor
         editor={ClassicEditor}
-        data={editorData}
-        onChange={(event, editor) => {
+        data={value}
+        onChange={(event: any, editor: any) => {
           const data = editor.getData();
-          setEditorData(data);
+          onChange(data); // Call the onChange prop to notify the parent
         }}
       />
     </div>
