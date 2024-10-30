@@ -1,5 +1,5 @@
-import ActionMenu from "@/components/products/action";
-import Image from "next/image";
+import ActionMenu from '@/components/products/action';
+import Image from 'next/image';
 
 interface ProductsTableItemProps {
   product: any;
@@ -15,6 +15,14 @@ export default function ProductsTableItem({
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onCheckboxChange(product.id, e.target.checked);
   };
+
+  const categoryNames =
+    product?.categoryProducts?.map((item: any) => item.category.name) || [];
+
+  const displayedCategories =
+    categoryNames.length > 3
+      ? categoryNames.slice(0, 3).join(', ') + '...'
+      : categoryNames.join(', ');
 
   return (
     <tr>
@@ -50,10 +58,17 @@ export default function ProductsTableItem({
         </div>
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-        <div className="text-left">{product.slug}</div>
+        <div className="text-left">{product.sku}</div>
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-        <div className="text-left">{product.categoryId}</div>
+        <div className="flex items-center">
+          {displayedCategories}
+          {categoryNames.length > 3 && (
+            <div className="text-sm font-medium text-green-700 px-1.5 bg-green-500/20 rounded-full w-fit ml-2">
+              +{categoryNames.length - 3}
+            </div>
+          )}
+        </div>
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="text-center">{product.collection.name}</div>
@@ -70,7 +85,7 @@ export default function ProductsTableItem({
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="font-medium text-left text-green-600">
-          {product.isAvailable ? "True" : "False"}
+          {product.isAvailable ? 'True' : 'False'}
         </div>
       </td>
       <td className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">

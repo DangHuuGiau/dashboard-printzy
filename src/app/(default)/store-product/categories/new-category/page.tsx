@@ -58,7 +58,8 @@ export default function NewCategory() {
         <div className="px-5 py-4 mb-8">
           <div className="flex flex-wrap justify-end space-x-2">
             <button
-              onClick={() => console.log('Cancel')}
+              type="button"
+              onClick={() => handleCancel()}
               className="text-gray-800 border-gray-200 btn-sm dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 dark:text-gray-300"
             >
               Cancel
@@ -91,7 +92,7 @@ export default function NewCategory() {
                       <AddProductsModal onAddProducts={setSelectedProducts} />
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col w-full gap-3">
                       <AddProductsModal onAddProducts={setSelectedProducts} />
                       <ProductsInCategory
                         products={selectedProducts}

@@ -31,7 +31,7 @@ export default function AddProductsModal(props: Props) {
 
   const handleSave = () => {
     onAddProducts(selectedProducts);
-    setModalOpen(false); // Close modal after saving
+    setModalOpen(false);
   };
 
   return (
@@ -39,6 +39,7 @@ export default function AddProductsModal(props: Props) {
       <div className="flex flex-wrap items-center -m-1.5">
         <div className="m-1.5">
           <button
+            type="button"
             className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
             onClick={() => {
               setModalOpen(true);

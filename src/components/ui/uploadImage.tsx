@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 interface ImageUploadProps {
   variantIndex: number;
-  onImageUpload: (variantIndex: number, imageUrl: string | null) => void;
+  onImageUpload: (variantIndex: number, image: File | null) => void;
   onDeleteImage: (variantIndex: number) => void;
 }
 
@@ -18,7 +18,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     if (file && file.type.startsWith('image/')) {
       const imageURL = URL.createObjectURL(file);
       setSelectedImage(imageURL);
-      onImageUpload(variantIndex, imageURL);
+      onImageUpload(variantIndex, file);
     } else {
       alert('Please upload a valid image file');
     }

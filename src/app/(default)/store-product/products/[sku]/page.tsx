@@ -16,10 +16,13 @@ import variantsService from '@/api/variants';
 import { useRouter } from 'next/navigation';
 import { useConfirm } from '@/contexts/modal/ConfirmContext';
 import ConfirmModal from '@/components/ui/confirm-modal';
+import useProduct from '@/hooks/useProduct';
 
-export default function NewProduct() {
+export default function SingleProduct({ params }: { params: { sku: string } }) {
   const router = useRouter();
   const { confirm } = useConfirm();
+
+  const product = useProduct(params?.sku);
 
   const categories = useCategories();
   const collections = useCollections();
@@ -32,12 +35,39 @@ export default function NewProduct() {
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collectionId, setCollectionId] = useState<number | null>(null);
 
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<File[] | any[]>([]);
 
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [variants, setVariants] = useState<any[]>([]);
-  console.log('selectedOptions', selectedOptions);
-  console.log('variants', variants);
+
+  const initVariants = async (productId: string) => {
+    const { data } = await variantsService.getList(productId);
+    setVariants(data);
+  };
+
+  useEffect(() => {
+    if (product) {
+      setName(product.name);
+      setPrice(product.price);
+      setDiscountPrice(product.discountPrice);
+      setDescription(product.description);
+      setCollectionId(product.collection.id);
+      setCategoryIds(
+        product.categoryProducts.map((item: any) => item.category.id)
+      );
+      setSelectedOptions(
+        product.productOptions.map(({ option, productOptionValues }: any) => ({
+          id: option.id,
+          name: option.name,
+          optionValues: productOptionValues.map(({ optionValue }: any) => ({
+            value: optionValue.value,
+            optionValueId: optionValue,
+          })),
+        }))
+      );
+      initVariants(product.id);
+    }
+  }, [product]);
 
   const generateVariants = (options: any) => {
     const variants: any[] = [];
@@ -97,12 +127,10 @@ export default function NewProduct() {
 
   const handleFormSubmit = async () => {
     try {
-      // Upload product images
       const imageUploadResults = await Promise.all(
         images.map((image) => uploadsService.uploadFile(image))
       );
 
-      // Prepare product data
       const productData = {
         name,
         slug,
@@ -137,20 +165,22 @@ export default function NewProduct() {
           })
         )
       );
+
       const variantImageUploadResults = await Promise.all(
         variants.map((variant) => uploadsService.uploadFile(variant?.image))
       );
-      console.log(123, variantImageUploadResults);
 
+      // Prepare variants data
       const variantsData = variants.map((variant, index) => ({
         price: variant.price,
         baseCost: variant.baseCost,
         sku: variant.sku.toUpperCase(),
         isAvailable: variant.isAvailable,
-        uploadId: variantImageUploadResults[index].id,
+        uploadId: variantImageUploadResults[index].uploadId,
         optionValues: variant.optionValues,
       }));
 
+      // Create variants
       await Promise.all(
         variantsData.map((variant) =>
           variantsService.create(productId, variant)
@@ -215,6 +245,16 @@ export default function NewProduct() {
                 Mockup Images
               </h2>
               <MockupUpload
+                initImageLink={
+                  product
+                    ? [
+                        product.upload.path,
+                        ...product.photos.map(
+                          (photo: any) => photo.upload.path
+                        ),
+                      ]
+                    : []
+                }
                 onImageUpload={handleImageUpload}
                 onDeleteImage={handleDeleteImage}
               />

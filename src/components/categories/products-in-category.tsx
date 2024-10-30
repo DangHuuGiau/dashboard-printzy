@@ -10,10 +10,10 @@ interface Props {
 export default function ProductsInCategory(props: Props) {
   const { products, onDeleteProduct } = props;
   return (
-    <div className="grid grid-cols-4">
-      <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 rounded-xl">
-        {products.map((product: any, index) => (
-          <div className="flex flex-col h-full">
+    <div className="grid grid-cols-4 gap-4">
+      {products.map((product: any, index) => (
+        <div className="bg-white shadow-sm dark:bg-gray-800 rounded-xl">
+          <div className="flex flex-col h-fit">
             {/* Image */}
             <div className="relative">
               <Image
@@ -44,17 +44,15 @@ export default function ProductsInCategory(props: Props) {
               {/* Card body */}
               <div className="grow">
                 <header className="mb-2">
-                  <a href="#0">
-                    <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">
-                      {product?.name}
-                    </h3>
-                  </a>
+                  <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    {product?.name}
+                  </h3>
                 </header>
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

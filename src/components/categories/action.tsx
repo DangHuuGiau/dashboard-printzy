@@ -12,9 +12,13 @@ import Link from 'next/link';
 export default function CategoryActionMenu({
   align,
   className = '',
+  id,
+  onDelete,
 }: React.HTMLAttributes<HTMLDivElement> & {
   align?: 'left' | 'right';
   className?: string;
+  id: string;
+  onDelete: () => void;
 }) {
   return (
     <Menu as="div" className={`relative inline-flex ${className}`}>
@@ -55,7 +59,7 @@ export default function CategoryActionMenu({
                         ? 'text-gray-800 dark:text-gray-200'
                         : 'text-gray-600 dark:text-gray-300'
                     }`}
-                    href="#0"
+                    href={`/store-product/categories/${id}`}
                   >
                     Edit
                   </Link>
@@ -63,16 +67,16 @@ export default function CategoryActionMenu({
               </MenuItem>
               <MenuItem as="li">
                 {({ active }) => (
-                  <Link
+                  <button
+                    onClick={onDelete}
                     className={`font-medium text-sm flex py-1 px-3 ${
                       active
                         ? 'text-gray-800 dark:text-gray-200'
                         : 'text-gray-600 dark:text-gray-300'
                     }`}
-                    href="#0"
                   >
                     Delete
-                  </Link>
+                  </button>
                 )}
               </MenuItem>
             </MenuItems>

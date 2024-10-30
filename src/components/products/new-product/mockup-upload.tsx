@@ -1,16 +1,34 @@
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
-const MockupUpload: React.FC = () => {
+interface Props {
+  initImageLink?: string[];
+  onImageUpload: (images: File[] | null) => void;
+  onDeleteImage: (index: number) => void;
+}
+
+const MockupUpload: React.FC<Props> = ({
+  initImageLink,
+  onImageUpload,
+  onDeleteImage,
+}) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (initImageLink) {
+      setSelectedImages(initImageLink);
+    }
+  }, [initImageLink]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     if (imageFiles.length !== files.length) {
-      alert("Please upload only image files.");
+      alert('Please upload only image files.');
     }
+
+    onImageUpload(imageFiles);
 
     const newImageUrls = imageFiles.map((file) => URL.createObjectURL(file));
     setSelectedImages((prevImages) => [...prevImages, ...newImageUrls]);
@@ -18,7 +36,12 @@ const MockupUpload: React.FC = () => {
 
   const handleRemoveImage = (index: number) => {
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    onDeleteImage(index);
   };
+
+  useEffect(() => {
+    if (initImageLink) setSelectedImages(initImageLink);
+  }, [initImageLink]);
 
   return (
     <div className="grid gap-5 md:grid-cols-3">

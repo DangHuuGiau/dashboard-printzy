@@ -1,16 +1,24 @@
-"use client";
+'use client';
 
-import { SelectedItemsProvider } from "@/app/selected-items-context";
-import DeleteButton from "@/components/delete-button";
-import DateSelect from "@/components/date-select";
-import FilterButton from "@/components/dropdown-filter";
-import ProductsTable from "./products-table";
-import PaginationClassic from "@/components/pagination-classic";
-import useProducts from "@/hooks/useProducts";
-import Link from "next/link";
+import { SelectedItemsProvider } from '@/app/selected-items-context';
+import DeleteButton from '@/components/delete-button';
+import ProductsTable from './products-table';
+import useProducts from '@/hooks/useProducts';
+import Link from 'next/link';
+import MoreActionsSelect from '@/components/products/more-actions-select';
+import { useState } from 'react';
+import ProductsPagination from './pagination';
+
+const LIMIT_PER_PAGE = 10;
 
 function ProductsContent() {
-  const products = useProducts({});
+  const [filterParams, setFilterParams] = useState<any>({
+    limit: LIMIT_PER_PAGE,
+    skip: 0,
+  });
+
+  const productsData = useProducts(filterParams);
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[96rem] mx-auto">
       {/* Page header */}
@@ -28,14 +36,11 @@ function ProductsContent() {
           <DeleteButton />
 
           {/* Dropdown */}
-          <DateSelect />
-
-          {/* Filter button */}
-          <FilterButton align="right" />
+          <MoreActionsSelect />
 
           {/* Add customer button */}
           <Link
-            href={"/store-product/new-product"}
+            href={'/store-product/new-product'}
             className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
           >
             <svg
@@ -52,11 +57,23 @@ function ProductsContent() {
       </div>
 
       {/* Table */}
-      <ProductsTable products={products} />
+      <ProductsTable
+        products={productsData?.data}
+        filterParams={filterParams}
+        setFilterParams={setFilterParams}
+      />
 
       {/* Pagination */}
       <div className="mt-8">
-        <PaginationClassic />
+        <ProductsPagination
+          filterParams={filterParams}
+          setFilterParams={setFilterParams}
+          data={{
+            limit: productsData?.$limit,
+            skip: productsData?.$skip,
+            total: productsData?.total,
+          }}
+        />
       </div>
     </div>
   );

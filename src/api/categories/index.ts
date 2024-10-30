@@ -1,10 +1,12 @@
 import { SCHEMA } from '@/constant/schema';
+import axiosInstance from '@/library/axios/axiosConfig';
 import axios from 'axios';
 
-export const getList = async () => {
+export const getList = async (params: any) => {
   const res = await axios({
     method: 'GET',
     url: `${SCHEMA.API_BASE}/categories`,
+    params,
   });
   return res;
 };
@@ -18,7 +20,7 @@ export const getOne = async (param: string) => {
 };
 
 export const create = async (data: any) => {
-  const res = await axios({
+  const res = await axiosInstance({
     method: 'POST',
     url: `${SCHEMA.API_BASE}/categories`,
     data,
@@ -27,10 +29,18 @@ export const create = async (data: any) => {
 };
 
 export const update = async (id: string, data: any) => {
-  const res = await axios({
+  const res = await axiosInstance({
     method: 'PATCH',
     url: `${SCHEMA.API_BASE}/categories/${id}`,
     data,
+  });
+  return res;
+};
+
+export const deleteOne = async (id: number) => {
+  const res = await axiosInstance({
+    method: 'DELETE',
+    url: `${SCHEMA.API_BASE}/categories/${id}`,
   });
   return res;
 };
@@ -40,6 +50,7 @@ const categoriesService = {
   create,
   update,
   getOne,
+  deleteOne,
 };
 
 export default categoriesService;

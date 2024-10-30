@@ -1,5 +1,5 @@
-import productsService from "@/api/products";
-import { useState, useEffect } from "react";
+import productsService from '@/api/products';
+import { useState, useEffect } from 'react';
 
 interface UseProductsParams {
   [key: string]: any;
@@ -9,23 +9,16 @@ const useProducts = ({
   limit,
   skip,
   name,
+  sku,
   categoryId,
   collectionId,
   price,
-  color,
-  style,
-  size,
   sort,
+  isAvailable,
 }: UseProductsParams) => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [productsData, setProductsData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const orderOptions = {
-    0: { createdAt: "ASC" },
-    1: { price: "ASC" },
-    2: { price: "DESC" },
-  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -38,14 +31,13 @@ const useProducts = ({
         if (limit !== undefined) query.$limit = limit;
         if (skip !== undefined) query.$skip = skip;
         if (name) query.name = { $iLike: `%${name}%` };
+        if (sku) query.sku = { $iLike: `%${sku}%` };
         if (categoryId !== undefined) query.categoryId = categoryId;
         if (collectionId !== undefined) query.collectionId = collectionId;
-        query.options = { color, style, size };
-
-        query.$order = orderOptions[sort as 0 | 1 | 2] || {};
+        if (isAvailable !== undefined) query.isAvailable = isAvailable;
 
         if (price) {
-          const [minPrice, maxPrice] = price.split("-").map(Number);
+          const [minPrice, maxPrice] = price.split('-').map(Number);
           if (!isNaN(minPrice) && !isNaN(maxPrice)) {
             query.price = { $btw: [minPrice, maxPrice] };
           }
@@ -55,16 +47,16 @@ const useProducts = ({
           if (
             query[key] === null ||
             query[key] === undefined ||
-            query[key] === ""
+            query[key] === ''
           ) {
             delete query[key];
           }
         });
 
         const response = await productsService.getList(query);
-        setProducts(response?.data?.data || []);
+        setProductsData(response?.data || {});
       } catch (err) {
-        setError("Failed to fetch products.");
+        setError('Failed to fetch products.');
       } finally {
         setLoading(false);
       }
@@ -75,16 +67,15 @@ const useProducts = ({
     limit,
     skip,
     name,
+    sku,
     categoryId,
     collectionId,
     price,
-    color,
-    style,
-    size,
     sort,
+    isAvailable,
   ]);
 
-  return products;
+  return productsData;
 };
 
 export default useProducts;

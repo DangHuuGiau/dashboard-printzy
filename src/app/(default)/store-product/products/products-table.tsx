@@ -1,9 +1,20 @@
-"use client";
+'use client';
 
-import { useItemSelection } from "@/components/utils/use-item-selection";
-import ProductsTableItem from "./products-table-item";
+import { useItemSelection } from '@/components/utils/use-item-selection';
+import ProductsTableItem from './products-table-item';
+import FilterDrawer from './filter-drawer';
 
-export default function ProductsTable({ products }: { products: any[] }) {
+interface Props {
+  products: any[];
+  filterParams: any;
+  setFilterParams: (filterParams: any) => void;
+}
+
+export default function ProductsTable({
+  products,
+  filterParams,
+  setFilterParams,
+}: Props) {
   const {
     selectedItems,
     isAllSelected,
@@ -13,13 +24,48 @@ export default function ProductsTable({ products }: { products: any[] }) {
 
   return (
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
-      <header className="px-5 py-4">
+      <header className="flex items-center justify-between px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          All products{" "}
+          Show products{' '}
           <span className="font-medium text-gray-400 dark:text-gray-500">
             {products?.length}
           </span>
         </h2>
+        <div className="flex items-center gap-2">
+          <FilterDrawer
+            filterParams={filterParams}
+            setFilterParams={setFilterParams}
+          />
+          <div>
+            <div className="relative">
+              <input
+                id="form-search"
+                className="w-full form-input pl-9"
+                type="search"
+                placeholder="Search product..."
+                onChange={(e) =>
+                  setFilterParams({ ...filterParams, name: e.target.value })
+                }
+              />
+              <button
+                className="absolute inset-0 right-auto group"
+                type="submit"
+                aria-label="Search"
+              >
+                <svg
+                  className="ml-3 mr-2 text-gray-400 fill-current shrink-0 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M7 14c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zM7 2C4.243 2 2 4.243 2 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5z" />
+                  <path d="M15.707 14.293L13.314 11.9a8.019 8.019 0 01-1.414 1.414l2.393 2.393a.997.997 0 001.414 0 .999.999 0 000-1.414z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </header>
       <div>
         {/* Table */}
@@ -69,7 +115,7 @@ export default function ProductsTable({ products }: { products: any[] }) {
             </thead>
             {/* Table body */}
             <tbody className="text-sm divide-y divide-gray-100 dark:divide-gray-700/60">
-              {products.map((product) => (
+              {products?.map((product) => (
                 <ProductsTableItem
                   key={product.id}
                   product={product}

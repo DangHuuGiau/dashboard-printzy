@@ -1,12 +1,31 @@
 'use client';
 
+import categoriesService from '@/api/categories';
 import CategoryActionMenu from '@/components/categories/action';
+import ConfirmModal from '@/components/ui/confirm-modal';
+import { useConfirm } from '@/contexts/modal/ConfirmContext';
 import useCategories from '@/hooks/useCategories';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Categories() {
-  const categories = useCategories();
+  const { confirm } = useConfirm();
+
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const categories = useCategories({ name: searchTerm });
+
+  const handleDelete = async (id: number) => {
+    await categoriesService.deleteOne(id);
+  };
+
+  const onConfirmDelete = (name: string, id: number) => {
+    confirm({
+      title: `Delete this category ${name}`,
+      message: `Are you sure to delete this category ${name}`,
+      onConfirm: () => handleDelete(id),
+    });
+  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[96rem] mx-auto">
@@ -23,6 +42,7 @@ export default function Categories() {
                 className="w-full form-input pl-9"
                 type="search"
                 placeholder="Search..."
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button
                 className="absolute inset-0 right-auto group"
@@ -55,22 +75,22 @@ export default function Categories() {
             >
               <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
             </svg>
-            <span className="max-xs:sr-only">Add Product</span>
+            <span className="max-xs:sr-only">Add Category</span>
           </Link>
         </div>
       </div>
       <div className="grid grid-cols-4 gap-6">
         {categories.map((category) => (
-          <Link
-            href={`/store-product/categories/${category.id}`}
+          <div
+            // href={`/store-product/categories/${category.id}`}
             className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 rounded-xl"
             key={`category-${category.id}`}
           >
             <div className="flex flex-col h-52">
               {/* Image */}
-              <div className="relative ">
+              <div className="relative w-full h-full">
                 <Image
-                  className="w-full"
+                  className="object-cover w-full h-full"
                   src={category?.upload?.path}
                   width={301}
                   height={226}
@@ -84,38 +104,18 @@ export default function Categories() {
                   </div>
                 </div>
                 <div className="absolute right-0 mb-4 mr-4 top-4">
-                  <CategoryActionMenu align="right" />
+                  <CategoryActionMenu
+                    align="right"
+                    id={category.id}
+                    onDelete={() => onConfirmDelete(category.name, category.id)}
+                  />
                 </div>
               </div>
             </div>
-          </Link>
-        ))}
-        <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 rounded-xl">
-          <div className="flex flex-col h-52">
-            {/* Image */}
-            <Link
-              href={'/store-product/categories/new-category'}
-              className="flex items-center justify-center h-full"
-            >
-              <svg
-                className="w-16 h-16 text-gray-500 dark:text-gray-400 "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </Link>
           </div>
-        </div>
+        ))}
       </div>
+      <ConfirmModal />
     </div>
   );
 }

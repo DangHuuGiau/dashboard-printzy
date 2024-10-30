@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import ModalBasic from "@/components/modal-basic";
-import useOptions from "@/hooks/useOptions";
+import { useEffect, useState } from 'react';
+import ModalBasic from '@/components/modal-basic';
+import useOptions from '@/hooks/useOptions';
 
 interface Props {
   selectedOptions: any[];
@@ -17,7 +17,7 @@ export default function AddOptionsModal(props: Props) {
   const [selectedOptionId, setSelectedOptionId] = useState<any>();
   const [selectedChoices, setSelectedChoices] = useState<any[]>([]);
 
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const choices =
     options?.find((option: any) => option.id === selectedOptionId)
@@ -51,14 +51,13 @@ export default function AddOptionsModal(props: Props) {
         id: selectedOption.id,
         name: selectedOption.name,
         optionValues: selectedChoices.map((choice) => ({
-          value: choice, // This should match the structure you want
-          optionId: selectedOption.id,
+          value: choice,
+          optionValueId: choices.find((option: any) => option.value === choice),
         })),
       };
 
-      // Add the new option to the selectedOptions array
       setSelectedOptions([...selectedOptions, newOption]);
-      setModalOpen(false); // Close the modal after saving
+      setModalOpen(false);
     }
   };
 

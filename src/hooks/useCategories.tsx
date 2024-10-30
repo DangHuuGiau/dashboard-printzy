@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
-import categoriesService from "@/api/categories";
+import { useState, useEffect } from 'react';
+import categoriesService from '@/api/categories';
+interface Params {
+  name?: string; // Make name optional
+}
 
-const useCategories = () => {
+const useCategories = ({ name }: Params = {}) => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -9,17 +12,20 @@ const useCategories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await categoriesService.getList();
+        const query: any = {};
+        if (name) query.name = { $iLike: `%${name}%` };
+
+        const response = await categoriesService.getList(query);
         setCategories(response?.data?.data || []);
       } catch (err) {
-        setError("Failed to fetch categories.");
+        setError('Failed to fetch categories.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchCategories();
-  }, []);
+  }, [name]);
 
   return categories;
 };
