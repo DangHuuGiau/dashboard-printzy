@@ -1,16 +1,15 @@
 'use client';
 
 import { useItemSelection } from '@/components/utils/use-item-selection';
-import OrdersTableItem from './orders-table-item';
+import OrdersTableItem from './customers-table-item';
 
-export default function OrdersTable({ orders }: { orders: any[] }) {
+export default function CustomersTable({ customers }: { customers: any[] }) {
   const {
     selectedItems,
     isAllSelected,
     handleCheckboxChange,
     handleSelectAllChange,
-  } = useItemSelection(orders);
-  console.log(orders);
+  } = useItemSelection(customers);
 
   return (
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
@@ -43,28 +42,27 @@ export default function OrdersTable({ orders }: { orders: any[] }) {
                   </div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Order</div>
-                </th>
-                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Date</div>
-                </th>
-                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <div className="font-semibold text-left">Customer</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Total</div>
+                  <div className="font-semibold text-left">Email</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold text-left">Created Date</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold text-left">Total Spend</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold">Cart Items</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold text-left">
+                    Default Location
+                  </div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <div className="font-semibold text-left">Status</div>
-                </th>
-                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold">Items</div>
-                </th>
-                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Location</div>
-                </th>
-                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Payment type</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <span className="sr-only">Menu</span>
@@ -72,12 +70,12 @@ export default function OrdersTable({ orders }: { orders: any[] }) {
               </tr>
             </thead>
             {/* Table body */}
-            {orders?.map((order) => (
+            {customers?.map((customer) => (
               <OrdersTableItem
-                key={order.id}
-                order={order}
+                key={customer.id}
+                customer={customer}
                 onCheckboxChange={handleCheckboxChange}
-                isSelected={selectedItems.includes(order.id)}
+                isSelected={selectedItems.includes(customer.id)}
               />
             ))}
           </table>

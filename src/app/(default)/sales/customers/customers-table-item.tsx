@@ -1,34 +1,23 @@
-import Image from 'next/image';
-import { OrdersProperties } from './orders-properties';
+import { CustomersProperties } from './customers-properties';
 import dayjs from 'dayjs';
-import Image01 from '/public/images/icon-01.svg';
-import Image02 from '/public/images/icon-02.svg';
-import Image03 from '/public/images/icon-03.svg';
 
-interface OrdersTableItemProps {
-  order: any;
+interface CustomersTableItemProps {
+  customer: any;
   onCheckboxChange: (id: number, checked: boolean) => void;
   isSelected: boolean;
 }
 
-function calculateTotal(purchases: any[]): number {
-  return purchases?.reduce((total, purchase) => {
-    const price = parseFloat(purchase?.variant?.price);
-    return total + purchase.quantity * price;
-  }, 0);
-}
-
 export default function OrdersTableItem({
-  order,
+  customer,
   onCheckboxChange,
   isSelected,
-}: OrdersTableItemProps) {
+}: CustomersTableItemProps) {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onCheckboxChange(order.id, e.target.checked);
+    onCheckboxChange(customer.id, e.target.checked);
   };
 
-  const { descriptionOpen, setDescriptionOpen, statusColor, typeIcon } =
-    OrdersProperties();
+  const { descriptionOpen, setDescriptionOpen, statusColor } =
+    CustomersProperties();
 
   return (
     <tbody className="text-sm">
@@ -47,56 +36,44 @@ export default function OrdersTableItem({
             </label>
           </div>
         </td>
+
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="flex items-center text-gray-800">
-            <div className="flex items-center justify-center w-10 h-10 mr-2 bg-gray-100 rounded-full shrink-0 dark:bg-gray-700 sm:mr-3">
-              <Image
-                className="ml-1"
-                src={
-                  order.status === 'processing' || 'cancelled' || 'refunded'
-                    ? Image01
-                    : Image02
-                }
-                width={20}
-                height={20}
-                alt={order.id}
-              />
-            </div>
-            <div className="font-medium text-sky-600">#{order.id}</div>
+          <div className="font-medium text-gray-800 dark:text-gray-100">
+            {customer.user.firstName} {customer.user.lastName}
           </div>
-        </td>
-        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div>{dayjs(order.createdAt).format('DD-MM-YYYY HH:mm')}</div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
           <div className="font-medium text-gray-800 dark:text-gray-100">
-            {order.firstName} {order.lastName}
+            {customer.user.email}
           </div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+          <div>{dayjs(customer.createdAt).format('DD-MM-YYYY HH:mm')}</div>
+        </td>
+        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
           <div className="font-medium text-left text-green-600">
-            {calculateTotal(order.purchases)}
+            {customer?.totalPaymentSum}$
+          </div>
+        </td>
+        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+          <div className="text-center">{customer?.totalCartItems}</div>
+        </td>
+        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+          <div className="text-left">
+            {
+              customer?.addresses.find(
+                (address: any) => address.isDefault === true
+              ).addressDetail
+            }
           </div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
           <div
             className={`inline-flex font-medium rounded-full text-center px-2.5 py-0.5 ${statusColor(
-              order.status
+              'active'
             )}`}
           >
-            {order.status}
-          </div>
-        </td>
-        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="text-center">{order?.purchases?.length}</div>
-        </td>
-        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="text-left">{order.address.addressDetail}</div>
-        </td>
-        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="flex items-center">
-            {typeIcon(order?.paymentMethod?.paymentMethod)}
-            <div>{order?.paymentMethod?.paymentMethod || 'Not yet paid'}</div>
+            Active
           </div>
         </td>
         <td className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
@@ -107,7 +84,7 @@ export default function OrdersTableItem({
               }`}
               aria-expanded={descriptionOpen}
               onClick={() => setDescriptionOpen(!descriptionOpen)}
-              aria-controls={`description-${order.id}`}
+              aria-controls={`description-${customer.id}`}
             >
               <span className="sr-only">Menu</span>
               <svg className="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -123,7 +100,7 @@ export default function OrdersTableItem({
       and it should match the number of columns in your table
       */}
       <tr
-        id={`description-${order.id}`}
+        id={`description-${customer.id}`}
         role="region"
         className={`${!descriptionOpen && 'hidden'}`}
       >
@@ -136,18 +113,15 @@ export default function OrdersTableItem({
             >
               <path d="M1 16h3c.3 0 .5-.1.7-.3l11-11c.4-.4.4-1 0-1.4l-3-3c-.4-.4-1-.4-1.4 0l-11 11c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1zm1-3.6l10-10L13.6 4l-10 10H2v-1.6z" />
             </svg>
-            {order.purchases.map((purchase: any, index: number) => (
-              <div className="flex flex-col ml-5 italic">
-                <span>Line Item: {index + 1}</span>
-                <span>Product Name: {purchase.product.name}</span>
-                <span>Product SKU: {purchase.product.sku}</span>
-                <span>Variant SKU: {purchase.variant.sku}</span>
-                <span>Quantity: {purchase.quantity}</span>
-                <span>Price: {purchase.variant.price}</span>
-                <span>Customize File: {purchase?.customizeUpload?.path}</span>
-                <hr className="mt-1 h-0.5 border-t-0 bg-neutral-300 dark:bg-white/10 w-full" />
-              </div>
-            ))}
+            <div className="flex flex-col italic">
+              <span>Gender: {customer.user.gender}</span>
+              <span>Sub Addresses:</span>
+              {customer.addresses.map((address: any) => (
+                <span>
+                  - {address.addressDetail} {address.phone}
+                </span>
+              ))}
+            </div>
           </div>
         </td>
       </tr>

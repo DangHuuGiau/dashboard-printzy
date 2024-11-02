@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface ImageUploadProps {
+  image?: any;
   variantIndex: number;
   onImageUpload: (variantIndex: number, image: File | null) => void;
   onDeleteImage: (variantIndex: number) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
+  image,
   variantIndex,
   onImageUpload,
   onDeleteImage,
 }) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const imageURL = URL.createObjectURL(file);
-      setSelectedImage(imageURL);
       onImageUpload(variantIndex, file);
     } else {
       alert('Please upload a valid image file');
@@ -30,12 +28,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         htmlFor={`dropzone-file-${variantIndex}`}
         className="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer h-28 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
-        {selectedImage ? (
+        {image ? (
           <div className="relative">
             <button
               onClick={() => {
                 onDeleteImage(variantIndex);
-                setSelectedImage(null);
               }}
               className="absolute z-10 flex items-center justify-center w-5 h-5 text-xs text-white bg-gray-800 rounded-full top-1 right-1 hover:bg-red-600"
               aria-label="Remove image"
@@ -43,7 +40,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               &times;
             </button>
             <img
-              src={selectedImage}
+              src={
+                image instanceof File ? URL.createObjectURL(image) : image?.path
+              }
               alt="Uploaded Preview"
               className="object-cover w-full h-full rounded-lg"
             />

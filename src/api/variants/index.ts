@@ -11,6 +11,19 @@ export const create = async (productId: number, data: any) => {
   return res;
 };
 
+export const update = async (
+  productId: number,
+  variantId: number,
+  data: any
+) => {
+  const res = await axiosInstance({
+    method: 'PATCH',
+    url: `${SCHEMA.API_BASE}/products/${productId}/variants/${variantId}`,
+    data,
+  });
+  return res;
+};
+
 export const getList = async (productId: string) => {
   const res = await axios({
     method: 'GET',
@@ -22,6 +35,7 @@ export const getList = async (productId: string) => {
 const variantsService = {
   getList,
   create,
+  update,
 };
 
 export default variantsService;

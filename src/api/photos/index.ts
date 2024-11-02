@@ -1,17 +1,17 @@
 import { SCHEMA } from '@/constant/schema';
 import axiosInstance from '@/library/axios/axiosConfig';
 
-export const create = async (data: any) => {
+export const createMany = async (data: any) => {
   const res = await axiosInstance({
     method: 'POST',
-    url: `${SCHEMA.API_BASE}/photos`,
+    url: `${SCHEMA.API_BASE}/photos/batch`,
     data,
   });
   return res;
 };
 
 const photosService = {
-  create,
+  createMany,
 };
 
 export default photosService;

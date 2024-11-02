@@ -28,8 +28,18 @@ export const create = async (data: any) => {
   return res;
 };
 
+export const update = async (id: string, data: any) => {
+  const res = await axiosInstance({
+    method: 'PATCH',
+    url: `${SCHEMA.API_BASE}/products/${id}`,
+    data,
+  });
+  return res;
+};
+
 const productsService = {
   create,
+  update,
   getList,
   getOneBySKU,
 };

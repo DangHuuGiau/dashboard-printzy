@@ -4,8 +4,8 @@ import { useState } from 'react';
 
 const inventoryOption = [
   { id: 1, name: 'All', value: undefined },
-  { id: 2, name: 'In stock', value: true },
-  { id: 3, name: 'Out of stock', value: false },
+  { id: 2, name: 'On sale', value: true },
+  { id: 3, name: 'Out of sale', value: false },
 ];
 
 interface Props {
@@ -256,7 +256,7 @@ export default function FilterDrawer({ filterParams, setFilterParams }: Props) {
                 <div className="w-full h-full px-4 py-3 text-left transition bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600">
                   <div className="flex flex-wrap items-center justify-between mb-0.5">
                     <span className="font-semibold text-gray-800 dark:text-gray-100">
-                      Inventory
+                      Available on Store
                     </span>
                   </div>
                   {inventoryOption.map((option) => (

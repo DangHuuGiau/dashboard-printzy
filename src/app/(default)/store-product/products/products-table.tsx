@@ -106,7 +106,7 @@ export default function ProductsTable({
                   <div className="font-semibold text-left">Price</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Available</div>
+                  <div className="font-semibold text-left">On Store</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <span className="sr-only">Menu</span>

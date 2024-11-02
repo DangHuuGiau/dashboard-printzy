@@ -7,10 +7,11 @@ import useOptions from '@/hooks/useOptions';
 interface Props {
   selectedOptions: any[];
   setSelectedOptions: (option: any[]) => void;
+  isEdit?: boolean;
 }
 
 export default function AddOptionsModal(props: Props) {
-  const { selectedOptions, setSelectedOptions } = props;
+  const { selectedOptions, setSelectedOptions, isEdit } = props;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const options = useOptions();
@@ -67,22 +68,24 @@ export default function AddOptionsModal(props: Props) {
         {/* Basic Modal */}
         <div className="m-1.5">
           {/* Start */}
-          <button
-            className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
-            onClick={() => {
-              setModalOpen(true);
-            }}
-          >
-            <svg
-              className="text-gray-400 fill-current shrink-0"
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
+          {!isEdit && (
+            <button
+              className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
+              onClick={() => {
+                setModalOpen(true);
+              }}
             >
-              <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-            </svg>
-            <span className="ml-2">Add Options</span>
-          </button>
+              <svg
+                className="text-gray-400 fill-current shrink-0"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+              >
+                <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+              </svg>
+              <span className="ml-2">Add Options</span>
+            </button>
+          )}
           <ModalBasic
             isOpen={modalOpen}
             setIsOpen={setModalOpen}

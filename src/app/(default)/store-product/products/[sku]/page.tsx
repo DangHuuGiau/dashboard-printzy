@@ -1,22 +1,25 @@
 'use client';
 
 import AddOptionsModal from '@/components/products/new-product/modal-add-options';
-import CKEditorComponent from '@/components/ckeditor-input';
+const CKEditorComponent = dynamic(() => import('@/components/ckeditor-input'), {
+  ssr: false,
+});
 import MockupUpload from '@/components/products/new-product/mockup-upload';
 import OptionsTable from '@/components/products/new-product/options-table';
 import VariantsTable from '@/components/products/new-product/variants-table';
 import { useEffect, useState } from 'react';
 import useCategories from '@/hooks/useCategories';
 import useCollections from '@/hooks/useCollections';
-import uploadsService from '@/api/uploads';
-import productsService from '@/api/products';
-import photosService from '@/api/photos';
 import VariantsEditModal from '@/components/products/new-product/variant-edit-modal';
 import variantsService from '@/api/variants';
 import { useRouter } from 'next/navigation';
 import { useConfirm } from '@/contexts/modal/ConfirmContext';
 import ConfirmModal from '@/components/ui/confirm-modal';
 import useProduct from '@/hooks/useProduct';
+import dynamic from 'next/dynamic';
+import uploadsService from '@/api/uploads';
+import photosService from '@/api/photos';
+import productsService from '@/api/products';
 
 export default function SingleProduct({ params }: { params: { sku: string } }) {
   const router = useRouter();
@@ -30,7 +33,7 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [price, setPrice] = useState(0);
-  const [discountPrice, setDiscountPrice] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [description, setDescription] = useState('');
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collectionId, setCollectionId] = useState<number | null>(null);
@@ -42,14 +45,19 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
 
   const initVariants = async (productId: string) => {
     const { data } = await variantsService.getList(productId);
-    setVariants(data);
+    const variants = data.map((variant: any) =>
+      variant?.upload
+        ? { ...variant, image: variant?.upload }
+        : { ...variant, image: null }
+    );
+    setVariants(variants);
   };
 
   useEffect(() => {
     if (product) {
       setName(product.name);
-      setPrice(product.price);
-      setDiscountPrice(product.discountPrice);
+      setPrice(Number(product.price));
+      setDiscountPercent(Number(product.discountPercent));
       setDescription(product.description);
       setCollectionId(product.collection.id);
       setCategoryIds(
@@ -65,51 +73,17 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
           })),
         }))
       );
+      setImages(
+        product
+          ? [
+              product.upload,
+              ...product.photos.map((photo: any) => photo.upload),
+            ]
+          : []
+      );
       initVariants(product.id);
     }
   }, [product]);
-
-  const generateVariants = (options: any) => {
-    const variants: any[] = [];
-
-    const combine = (index: number, currentVariant: any) => {
-      if (index === options.length) {
-        const variant = {
-          price: 0,
-          baseCost: 0,
-          isAvailable: true,
-          sku: currentVariant
-            .map((optionValue: any) => optionValue.value)
-            .join('-'),
-          uploadId: 0,
-          optionValues: currentVariant.map((optionValue: any) => ({
-            optionId: optionValue.optionId,
-            valueId: optionValue.optionValueId.id,
-          })),
-        };
-        variants.push(variant);
-        return;
-      }
-
-      const option = options[index];
-      for (const value of option.optionValues) {
-        combine(index + 1, [
-          ...currentVariant,
-          { ...value, optionId: option.id },
-        ]);
-      }
-    };
-
-    combine(0, []);
-    return variants;
-  };
-
-  useEffect(() => {
-    if (selectedOptions?.length > 1) {
-      const variants = generateVariants(selectedOptions);
-      setVariants(variants);
-    }
-  }, [selectedOptions]);
 
   useEffect(() => {
     const generatedSlug = name
@@ -121,72 +95,75 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
   }, [name]);
 
   useEffect(() => {
-    if (isNaN(price)) setPrice(0);
-    if (isNaN(discountPrice)) setDiscountPrice(0);
-  }, [price, discountPrice]);
+    setPrice((prevPrice) => (isNaN(prevPrice) ? 0 : prevPrice));
+    setDiscountPercent((prevDiscount) =>
+      isNaN(prevDiscount) ? 0 : prevDiscount
+    );
+  }, [price, discountPercent]);
 
   const handleFormSubmit = async () => {
     try {
       const imageUploadResults = await Promise.all(
-        images.map((image) => uploadsService.uploadFile(image))
+        images.map((image) =>
+          image instanceof File ? uploadsService.uploadFile(image) : image
+        )
       );
 
       const productData = {
         name,
         slug,
         price,
-        discountPrice,
+        discountPercent,
         description,
         isAvailable: true,
-        stock: 0,
         categoryIds,
         collectionId: collectionId ?? 0,
         uploadId: imageUploadResults?.[0]?.id,
         isDeleted: false,
-        options: selectedOptions.map((option) => ({
-          optionId: option.id,
-          values: option.optionValues.map(
-            (value: any) => value.optionValueId.id
-          ),
-        })),
       };
 
       // Create product
-      const productResponse = await productsService.create(productData);
-      const productId = productResponse?.data?.id;
+      const productResponse = await productsService.update(
+        product.id,
+        productData
+      );
 
       // Upload product photos
 
-      await Promise.all(
-        imageUploadResults.slice(1).map((upload) =>
-          photosService.create({
-            productId,
-            uploadId: upload.id,
-          })
-        )
-      );
+      const photosUpload = imageUploadResults.slice(1).map((upload) => ({
+        productId: product.id,
+        uploadId: upload.id,
+      }));
+
+      await photosService.createMany(photosUpload);
 
       const variantImageUploadResults = await Promise.all(
-        variants.map((variant) => uploadsService.uploadFile(variant?.image))
+        variants.map((variant) =>
+          variant.image instanceof File
+            ? uploadsService.uploadFile(variant.image)
+            : variant.image
+        )
       );
 
       // Prepare variants data
       const variantsData = variants.map((variant, index) => ({
-        price: variant.price,
-        baseCost: variant.baseCost,
+        id: variant.id,
+        price: Number(variant.price),
+        baseCost: Number(variant.baseCost),
         sku: variant.sku.toUpperCase(),
         isAvailable: variant.isAvailable,
+        isInStock: variant.isInStock,
         uploadId: variantImageUploadResults[index].uploadId,
-        optionValues: variant.optionValues,
+        // optionValues: variant.optionValues,
       }));
 
       // Create variants
       await Promise.all(
         variantsData.map((variant) =>
-          variantsService.create(productId, variant)
+          variantsService.update(product.id, variant.id, variant)
         )
       );
-      router.push('/store-product/products');
+      // router.push('/store-product/products');
     } catch (error) {
       console.error('Error during form submission:', error);
     }
@@ -245,16 +222,7 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
                 Mockup Images
               </h2>
               <MockupUpload
-                initImageLink={
-                  product
-                    ? [
-                        product.upload.path,
-                        ...product.photos.map(
-                          (photo: any) => photo.upload.path
-                        ),
-                      ]
-                    : []
-                }
+                images={images}
                 onImageUpload={handleImageUpload}
                 onDeleteImage={handleDeleteImage}
               />
@@ -339,7 +307,8 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
                       <input
                         id="prefix"
                         className="w-full pl-12 form-input"
-                        type="text"
+                        type="number"
+                        step="0.01"
                         value={price}
                         onChange={(e) => setPrice(parseFloat(e.target.value))}
                       />
@@ -352,26 +321,36 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
                   </div>
                   {/* End */}
                 </div>
+
                 <div>
                   <label
                     className="block mb-1 text-sm font-medium"
                     htmlFor="prefix"
                   >
-                    Discount Price
+                    Discount Percent
                   </label>
                   <div className="relative">
                     <input
                       id="prefix"
                       className="w-full pl-12 form-input"
-                      type="text"
-                      value={discountPrice}
-                      onChange={(e) =>
-                        setDiscountPrice(parseFloat(e.target.value))
-                      }
+                      type="number" // Change type to number for better validation
+                      value={discountPercent}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        // Ensure the value is between 0 and 100
+                        if (value >= 0 && value <= 100) {
+                          setDiscountPercent(value);
+                        } else if (e.target.value === '') {
+                          // Allow clearing the input
+                          setDiscountPercent(0);
+                        }
+                      }}
+                      min={0} // Minimum value
+                      max={100} // Maximum value
                     />
                     <div className="absolute inset-0 right-auto flex items-center pointer-events-none">
                       <span className="px-3 text-sm font-medium text-gray-400 dark:text-gray-500">
-                        USD
+                        %
                       </span>
                     </div>
                   </div>
@@ -388,10 +367,13 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
                 <div className="m-1.5">
                   {/* Start */}
                   <AddOptionsModal
+                    isEdit={true}
                     selectedOptions={selectedOptions}
                     setSelectedOptions={setSelectedOptions}
                   />
-                  <OptionsTable options={selectedOptions} />
+                  <div className="pointer-events-none">
+                    <OptionsTable options={selectedOptions} />
+                  </div>
                   {/* End */}
                 </div>
               </div>

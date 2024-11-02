@@ -1,5 +1,6 @@
 import ActionMenu from '@/components/products/action';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface ProductsTableItemProps {
   product: any;
@@ -41,13 +42,15 @@ export default function ProductsTableItem({
       </td>
       <td className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="w-20 h-20 mr-2 shrink-0 sm:mr-3">
-          <Image
-            className="rounded-lg"
-            src={product?.upload.path}
-            width={400}
-            height={400}
-            alt={product.name}
-          />
+          <Link href={`/store-product/products/${product.sku}`}>
+            <Image
+              className="rounded-lg"
+              src={product?.upload.path}
+              width={400}
+              height={400}
+              alt={product.name}
+            />
+          </Link>
         </div>
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
@@ -75,11 +78,14 @@ export default function ProductsTableItem({
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="flex gap-2">
-          <div className="font-medium text-left text-sky-600">
-            {product.discountPrice}
+          <div className="font-bold text-left text-sky-600">
+            {product.price - (product.price * product.discountPercent) / 100}{' '}
           </div>
-          <div className="font-medium text-left line-through text-gray">
+          <div className="text-left line-through text-gray">
             {product.price}
+          </div>
+          <div className="text-left text-red-300">
+            {`(${product.discountPercent})%`}
           </div>
         </div>
       </td>

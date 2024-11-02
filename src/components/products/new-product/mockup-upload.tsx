@@ -1,25 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 
 interface Props {
-  initImageLink?: string[];
+  images: any[];
   onImageUpload: (images: File[] | null) => void;
   onDeleteImage: (index: number) => void;
 }
 
 const MockupUpload: React.FC<Props> = ({
-  initImageLink,
+  images,
   onImageUpload,
   onDeleteImage,
 }) => {
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (initImageLink) {
-      setSelectedImages(initImageLink);
-    }
-  }, [initImageLink]);
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const imageFiles = files.filter((file) => file.type.startsWith('image/'));
@@ -29,42 +21,39 @@ const MockupUpload: React.FC<Props> = ({
     }
 
     onImageUpload(imageFiles);
-
-    const newImageUrls = imageFiles.map((file) => URL.createObjectURL(file));
-    setSelectedImages((prevImages) => [...prevImages, ...newImageUrls]);
   };
 
   const handleRemoveImage = (index: number) => {
-    setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
     onDeleteImage(index);
   };
 
-  useEffect(() => {
-    if (initImageLink) setSelectedImages(initImageLink);
-  }, [initImageLink]);
-
   return (
     <div className="grid gap-5 md:grid-cols-3">
-      {selectedImages.map((image, index) => (
-        <div
-          key={index}
-          className="relative flex items-center justify-center w-full overflow-hidden border-2 border-gray-300 rounded-lg h-52"
-        >
-          <button
-            onClick={() => handleRemoveImage(index)}
-            className="absolute z-10 flex items-center justify-center w-5 h-5 text-xs text-white bg-gray-800 rounded-full top-1 right-1 hover:bg-red-600"
-            aria-label="Remove image"
+      {images?.map((image, index) => {
+        const pathImage =
+          image instanceof File ? URL.createObjectURL(image) : image?.path;
+
+        return (
+          <div
+            key={index}
+            className="relative flex items-center justify-center w-full overflow-hidden border-2 border-gray-300 rounded-lg h-52"
           >
-            &times;
-          </button>
-          <Image
-            src={image}
-            alt={`Uploaded preview ${index}`}
-            layout="fill"
-            objectFit="cover"
-          />
-        </div>
-      ))}
+            <button
+              onClick={() => handleRemoveImage(index)}
+              className="absolute z-10 flex items-center justify-center w-5 h-5 text-xs text-white bg-gray-800 rounded-full top-1 right-1 hover:bg-red-600"
+              aria-label="Remove image"
+            >
+              &times;
+            </button>
+            <Image
+              src={pathImage}
+              alt={`Uploaded preview ${index}`}
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+        );
+      })}
       <div className="flex items-center justify-center w-28">
         <label
           htmlFor="dropzone-file"

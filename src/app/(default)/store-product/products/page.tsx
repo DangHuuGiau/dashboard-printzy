@@ -10,7 +10,6 @@ import { useState } from 'react';
 import ProductsPagination from './pagination';
 
 const LIMIT_PER_PAGE = 10;
-
 function ProductsContent() {
   const [filterParams, setFilterParams] = useState<any>({
     limit: LIMIT_PER_PAGE,

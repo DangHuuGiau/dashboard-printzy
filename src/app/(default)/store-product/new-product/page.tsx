@@ -1,7 +1,9 @@
 'use client';
 
 import AddOptionsModal from '@/components/products/new-product/modal-add-options';
-import CKEditorComponent from '@/components/ckeditor-input';
+const CKEditorComponent = dynamic(() => import('@/components/ckeditor-input'), {
+  ssr: false,
+});
 import MockupUpload from '@/components/products/new-product/mockup-upload';
 import OptionsTable from '@/components/products/new-product/options-table';
 import VariantsTable from '@/components/products/new-product/variants-table';
@@ -16,6 +18,7 @@ import variantsService from '@/api/variants';
 import { useRouter } from 'next/navigation';
 import { useConfirm } from '@/contexts/modal/ConfirmContext';
 import ConfirmModal from '@/components/ui/confirm-modal';
+import dynamic from 'next/dynamic';
 
 export default function NewProduct() {
   const router = useRouter();
@@ -27,7 +30,7 @@ export default function NewProduct() {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [price, setPrice] = useState(0);
-  const [discountPrice, setDiscountPrice] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [description, setDescription] = useState('');
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collectionId, setCollectionId] = useState<number | null>(null);
@@ -36,8 +39,6 @@ export default function NewProduct() {
 
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [variants, setVariants] = useState<any[]>([]);
-  console.log('selectedOptions', selectedOptions);
-  console.log('variants', variants);
 
   const generateVariants = (options: any) => {
     const variants: any[] = [];
@@ -48,6 +49,7 @@ export default function NewProduct() {
           price: 0,
           baseCost: 0,
           isAvailable: true,
+          isInStock: true,
           sku: currentVariant
             .map((optionValue: any) => optionValue.value)
             .join('-'),
@@ -91,13 +93,14 @@ export default function NewProduct() {
   }, [name]);
 
   useEffect(() => {
-    if (isNaN(price)) setPrice(0);
-    if (isNaN(discountPrice)) setDiscountPrice(0);
-  }, [price, discountPrice]);
+    setPrice((prevPrice) => (isNaN(prevPrice) ? 0 : prevPrice));
+    setDiscountPercent((prevDiscount) =>
+      isNaN(prevDiscount) ? 0 : prevDiscount
+    );
+  }, [price, discountPercent]);
 
   const handleFormSubmit = async () => {
     try {
-      // Upload product images
       const imageUploadResults = await Promise.all(
         images.map((image) => uploadsService.uploadFile(image))
       );
@@ -107,10 +110,9 @@ export default function NewProduct() {
         name,
         slug,
         price,
-        discountPrice,
+        discountPercent,
         description,
         isAvailable: true,
-        stock: 0,
         categoryIds,
         collectionId: collectionId ?? 0,
         uploadId: imageUploadResults?.[0]?.id,
@@ -129,24 +131,23 @@ export default function NewProduct() {
 
       // Upload product photos
 
-      await Promise.all(
-        imageUploadResults.slice(1).map((upload) =>
-          photosService.create({
-            productId,
-            uploadId: upload.id,
-          })
-        )
-      );
+      const photosUpload = imageUploadResults.slice(1).map((upload) => ({
+        productId,
+        uploadId: upload.id,
+      }));
+
+      await photosService.createMany(photosUpload);
+
       const variantImageUploadResults = await Promise.all(
         variants.map((variant) => uploadsService.uploadFile(variant?.image))
       );
-      console.log(123, variantImageUploadResults);
 
       const variantsData = variants.map((variant, index) => ({
         price: variant.price,
         baseCost: variant.baseCost,
         sku: variant.sku.toUpperCase(),
         isAvailable: variant.isAvailable,
+        isInStock: variant.isInStock,
         uploadId: variantImageUploadResults[index].id,
         optionValues: variant.optionValues,
       }));
@@ -215,6 +216,7 @@ export default function NewProduct() {
                 Mockup Images
               </h2>
               <MockupUpload
+                images={images}
                 onImageUpload={handleImageUpload}
                 onDeleteImage={handleDeleteImage}
               />
@@ -299,7 +301,8 @@ export default function NewProduct() {
                       <input
                         id="prefix"
                         className="w-full pl-12 form-input"
-                        type="text"
+                        type="number"
+                        step="0.01"
                         value={price}
                         onChange={(e) => setPrice(parseFloat(e.target.value))}
                       />
@@ -317,21 +320,30 @@ export default function NewProduct() {
                     className="block mb-1 text-sm font-medium"
                     htmlFor="prefix"
                   >
-                    Discount Price
+                    Discount Percent
                   </label>
                   <div className="relative">
                     <input
                       id="prefix"
                       className="w-full pl-12 form-input"
-                      type="text"
-                      value={discountPrice}
-                      onChange={(e) =>
-                        setDiscountPrice(parseFloat(e.target.value))
-                      }
+                      type="number" // Change type to number for better validation
+                      value={discountPercent}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        // Ensure the value is between 0 and 100
+                        if (value >= 0 && value <= 100) {
+                          setDiscountPercent(value);
+                        } else if (e.target.value === '') {
+                          // Allow clearing the input
+                          setDiscountPercent(0);
+                        }
+                      }}
+                      min={0} // Minimum value
+                      max={100} // Maximum value
                     />
                     <div className="absolute inset-0 right-auto flex items-center pointer-events-none">
                       <span className="px-3 text-sm font-medium text-gray-400 dark:text-gray-500">
-                        USD
+                        %
                       </span>
                     </div>
                   </div>
