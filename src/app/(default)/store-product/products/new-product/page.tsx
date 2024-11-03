@@ -19,6 +19,8 @@ import { useRouter } from 'next/navigation';
 import { useConfirm } from '@/contexts/modal/ConfirmContext';
 import ConfirmModal from '@/components/ui/confirm-modal';
 import dynamic from 'next/dynamic';
+import Banner02 from '@/components/banner-02';
+import { toast } from 'react-toastify';
 
 export default function NewProduct() {
   const router = useRouter();
@@ -34,6 +36,7 @@ export default function NewProduct() {
   const [description, setDescription] = useState('');
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collectionId, setCollectionId] = useState<number | null>(null);
+  const [trackingVariant, setTrackingVariant] = useState(false);
 
   const [images, setImages] = useState<File[]>([]);
 
@@ -46,8 +49,8 @@ export default function NewProduct() {
     const combine = (index: number, currentVariant: any) => {
       if (index === options.length) {
         const variant = {
-          price: 0,
-          baseCost: 0,
+          price: price || 0,
+          baseCost: price - 5 || 0,
           isAvailable: true,
           isInStock: true,
           sku: currentVariant
@@ -80,6 +83,8 @@ export default function NewProduct() {
     if (selectedOptions?.length > 1) {
       const variants = generateVariants(selectedOptions);
       setVariants(variants);
+    } else {
+      setVariants([]);
     }
   }, [selectedOptions]);
 
@@ -101,6 +106,8 @@ export default function NewProduct() {
 
   const handleFormSubmit = async () => {
     try {
+      handleCheckValid();
+
       const imageUploadResults = await Promise.all(
         images.map((image) => uploadsService.uploadFile(image))
       );
@@ -139,7 +146,11 @@ export default function NewProduct() {
       await photosService.createMany(photosUpload);
 
       const variantImageUploadResults = await Promise.all(
-        variants.map((variant) => uploadsService.uploadFile(variant?.image))
+        variants.map((variant) =>
+          variant?.image
+            ? uploadsService.uploadFile(variant.image)
+            : Promise.resolve({ id: null })
+        )
       );
 
       const variantsData = variants.map((variant, index) => ({
@@ -157,6 +168,7 @@ export default function NewProduct() {
           variantsService.create(productId, variant)
         )
       );
+      toast.success(`Create product successfully`);
       router.push('/store-product/products');
     } catch (error) {
       console.error('Error during form submission:', error);
@@ -188,6 +200,51 @@ export default function NewProduct() {
       action: 'Discard Change',
       onConfirm: () => router.push('/store-product/products'),
     });
+  };
+
+  const handleCheckValid = () => {
+    // Check if name is provided
+    if (!name.trim()) {
+      toast.error('Product name is required');
+      return false;
+    }
+
+    // Check if price is valid
+    if (price <= 0 || isNaN(price)) {
+      toast.error('Price must be a valid positive number');
+      return false;
+    }
+
+    // Ensure discount is within range
+    if (discountPercent < 0 || discountPercent > 100) {
+      toast.error('Discount percent must be between 0 and 100');
+      return false;
+    }
+
+    // Check if at least one category is selected
+    if (categoryIds.length === 0) {
+      toast.error('At least one category must be selected');
+      return false;
+    }
+
+    // Check if images are uploaded
+    if (images.length === 0) {
+      toast.error('At least one product image is required');
+      return false;
+    }
+
+    // Check if selected options have valid values (optional)
+    if (selectedOptions.some((option) => option.optionValues.length === 0)) {
+      toast.error('Each selected option must have at least one value');
+      return false;
+    }
+
+    if (variants && variants.length > 0) {
+      toast.error('Please add at least 100 variants before proceeding.');
+      return false;
+    }
+
+    return true;
   };
 
   return (
@@ -363,35 +420,70 @@ export default function NewProduct() {
                     selectedOptions={selectedOptions}
                     setSelectedOptions={setSelectedOptions}
                   />
-                  <OptionsTable options={selectedOptions} />
+                  <OptionsTable
+                    options={selectedOptions}
+                    setSelectedOptions={setSelectedOptions}
+                  />
                   {/* End */}
                 </div>
               </div>
             </div>
             {variants?.length > 0 && (
               <div>
-                <div className="flex items-center justify-between w-full mb-10">
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                    Variant - {variants?.length}
-                  </h2>
-
-                  <VariantsEditModal
-                    variants={variants}
-                    setVariants={setVariants}
-                  />
-                </div>
-                <div className="">
-                  <div className="m-1.5">
-                    {/* Start */}
-
-                    <VariantsTable
-                      variants={variants}
-                      setVariants={setVariants}
-                    />
-
-                    {/* End */}
+                <div className="m-3 w-fit">
+                  {/* Start */}
+                  <div className="flex flex-col items-start gap-4">
+                    <div className="text-base text-gray-400 dark:text-gray-500">
+                      Tracking Variant - Variant {variants.length}
+                    </div>
+                    <div className="form-switch">
+                      <input
+                        type="checkbox"
+                        id="switch-1"
+                        className="sr-only"
+                        checked={trackingVariant}
+                        onChange={() => setTrackingVariant(!trackingVariant)}
+                      />
+                      <label
+                        className="bg-gray-400 dark:bg-gray-700"
+                        htmlFor="switch-1"
+                      >
+                        <span
+                          className="bg-white shadow-sm"
+                          aria-hidden="true"
+                        ></span>
+                        <span className="sr-only">Switch label</span>
+                      </label>
+                    </div>
                   </div>
+                  {/* End */}
                 </div>
+                {trackingVariant && (
+                  <>
+                    <div className="flex items-center justify-between w-full mb-10">
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                        Variant - {variants?.length}
+                      </h2>
+
+                      <VariantsEditModal
+                        variants={variants}
+                        setVariants={setVariants}
+                      />
+                    </div>
+                    <div className="">
+                      <div className="m-1.5">
+                        {/* Start */}
+
+                        <VariantsTable
+                          variants={variants}
+                          setVariants={setVariants}
+                        />
+
+                        {/* End */}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

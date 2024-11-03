@@ -9,12 +9,14 @@ import {
 } from '@headlessui/react';
 import Link from 'next/link';
 
-export default function ActionMenu({
+export default function ProductActionMenu({
   align,
   className = '',
+  product,
 }: React.HTMLAttributes<HTMLDivElement> & {
   align?: 'left' | 'right';
   className?: string;
+  product: any;
 }) {
   return (
     <Menu as="div" className={`relative inline-flex ${className}`}>
@@ -69,7 +71,7 @@ export default function ActionMenu({
                         ? 'text-gray-800 dark:text-gray-200'
                         : 'text-gray-600 dark:text-gray-300'
                     }`}
-                    href="#0"
+                    href={`/store-product/products/${product.sku}`}
                   >
                     Edit
                   </Link>

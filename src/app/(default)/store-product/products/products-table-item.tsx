@@ -1,4 +1,6 @@
-import ActionMenu from '@/components/products/action';
+import ProductActionMenu from '@/app/(default)/store-product/products/product-action';
+import ActionMenu from '@/app/(default)/store-product/products/product-action';
+import Tooltip from '@/components/tooltip';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -55,8 +57,11 @@ export default function ProductsTableItem({
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="flex items-center">
-          <div className="font-medium text-gray-800 dark:text-gray-100">
-            {product.name}
+          <div className="flex items-center gap-2 font-medium text-gray-800 dark:text-gray-100">
+            <p className="truncate w-60">{product.name}</p>
+            <Tooltip bg="light">
+              <div className="text-xs whitespace-nowrap">{product.name}</div>
+            </Tooltip>
           </div>
         </div>
       </td>
@@ -95,7 +100,7 @@ export default function ProductsTableItem({
         </div>
       </td>
       <td className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-        <ActionMenu align="right" />
+        <ProductActionMenu align="right" product={product} />
       </td>
     </tr>
   );

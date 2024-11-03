@@ -61,9 +61,9 @@ export default function OrdersTableItem({
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
           <div className="text-left">
             {
-              customer?.addresses.find(
-                (address: any) => address.isDefault === true
-              ).addressDetail
+              customer?.addresses?.find(
+                (address: any) => address?.isDefault === true
+              )?.addressDetail
             }
           </div>
         </td>

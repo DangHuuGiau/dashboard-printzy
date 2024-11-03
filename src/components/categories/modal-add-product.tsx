@@ -106,28 +106,42 @@ export default function AddProductsModal(props: Props) {
                     </div>
                   </div>
                   <div className="w-full overflow-y-auto bg-white rounded shadow h-28">
-                    {products?.map((product: any) => (
-                      <div
-                        key={product.id}
-                        className="w-full border-b border-gray-100 cursor-pointer hover:bg-teal-100"
-                        onClick={() => handleChoiceClick(product)}
-                      >
-                        <div className="flex items-center w-full p-2 pl-2">
-                          <div className="flex items-center w-full gap-4">
-                            <div className="w-14 h-14">
-                              <Image
-                                className="rounded-full"
-                                src={product.upload.path}
-                                width={400}
-                                height={400}
-                                alt={product.name}
-                              />
+                    {products && products.length > 0 ? (
+                      products.map(
+                        (product: {
+                          id: string;
+                          upload: { path: string };
+                          name: string;
+                        }) => (
+                          <div
+                            key={product.id}
+                            className="w-full border-b border-gray-100 cursor-pointer hover:bg-teal-100"
+                            onClick={() => handleChoiceClick(product)}
+                          >
+                            <div className="flex items-center w-full p-2 pl-2">
+                              <div className="flex items-center w-full gap-4">
+                                <div className="w-14 h-14">
+                                  <Image
+                                    className="rounded-full"
+                                    src={product.upload.path}
+                                    width={56}
+                                    height={56}
+                                    alt={product.name}
+                                  />
+                                </div>
+                                <div className="mx-2 leading-6">
+                                  {product.name}
+                                </div>
+                              </div>
                             </div>
-                            <div className="mx-2 leading-6">{product.name}</div>
                           </div>
-                        </div>
+                        )
+                      )
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        {products ? 'No products available' : 'Loading...'}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>

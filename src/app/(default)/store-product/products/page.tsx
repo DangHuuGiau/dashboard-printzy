@@ -39,7 +39,7 @@ function ProductsContent() {
 
           {/* Add customer button */}
           <Link
-            href={'/store-product/new-product'}
+            href={'/store-product/products/new-product'}
             className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
           >
             <svg

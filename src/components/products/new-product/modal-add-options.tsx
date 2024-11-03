@@ -17,7 +17,6 @@ export default function AddOptionsModal(props: Props) {
   const options = useOptions();
   const [selectedOptionId, setSelectedOptionId] = useState<any>();
   const [selectedChoices, setSelectedChoices] = useState<any[]>([]);
-
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const choices =
@@ -57,7 +56,21 @@ export default function AddOptionsModal(props: Props) {
         })),
       };
 
-      setSelectedOptions([...selectedOptions, newOption]);
+      const existingOptionIndex = selectedOptions.findIndex(
+        (opt) => opt.id === selectedOptionId
+      );
+
+      if (existingOptionIndex !== -1) {
+        // Nếu option đã tồn tại, cập nhật lại optionValues
+        const updatedOptions = [...selectedOptions];
+        updatedOptions[existingOptionIndex].optionValues =
+          newOption.optionValues;
+        setSelectedOptions(updatedOptions);
+      } else {
+        // Nếu option chưa tồn tại, thêm option mới vào
+        setSelectedOptions([...selectedOptions, newOption]);
+      }
+
       setModalOpen(false);
     }
   };

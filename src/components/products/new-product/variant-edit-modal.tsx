@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ModalBasic from '@/components/modal-basic';
 
 interface Props {
@@ -25,6 +25,10 @@ export default function VariantsEditModal(props: Props) {
     setVariants(editedVariants);
     setModalOpen(false);
   };
+
+  useEffect(() => {
+    setEditedVariants(variants);
+  }, []);
 
   return (
     <div>

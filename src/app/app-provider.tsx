@@ -2,6 +2,7 @@
 
 import { AuthProvider } from '@/contexts/auth/auth.provider';
 import { ConfirmProvider } from '@/contexts/modal/ConfirmContext';
+import ToastProvider from '@/contexts/toast/toast.provider';
 import {
   createContext,
   Dispatch,
@@ -28,6 +29,7 @@ export default function AppProvider({
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   return (
     <AppContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+      <ToastProvider />
       <AuthProvider>
         <ConfirmProvider>{children}</ConfirmProvider>
       </AuthProvider>

@@ -5,9 +5,12 @@ import uploadsService from '@/api/uploads';
 import CategoryImageUpload from '@/components/categories/category-upload-image';
 import AddProductsModal from '@/components/categories/modal-add-product';
 import ProductsInCategory from '@/components/categories/products-in-category';
-import CKEditorComponent from '@/components/ckeditor-input';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+const CKEditorComponent = dynamic(() => import('@/components/ckeditor-input'), {
+  ssr: false,
+});
 
 export default function NewCategory() {
   const router = useRouter();

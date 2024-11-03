@@ -20,6 +20,7 @@ import dynamic from 'next/dynamic';
 import uploadsService from '@/api/uploads';
 import photosService from '@/api/photos';
 import productsService from '@/api/products';
+import { toast } from 'react-toastify';
 
 export default function SingleProduct({ params }: { params: { sku: string } }) {
   const router = useRouter();
@@ -138,14 +139,16 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
       await photosService.createMany(photosUpload);
 
       const variantImageUploadResults = await Promise.all(
-        variants.map((variant) =>
-          variant.image instanceof File
+        variants.map((variant) => {
+          if (!variant.image) {
+            return { id: null };
+          }
+          return variant.image instanceof File
             ? uploadsService.uploadFile(variant.image)
-            : variant.image
-        )
+            : variant.image;
+        })
       );
 
-      // Prepare variants data
       const variantsData = variants.map((variant, index) => ({
         id: variant.id,
         price: Number(variant.price),
@@ -154,16 +157,15 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
         isAvailable: variant.isAvailable,
         isInStock: variant.isInStock,
         uploadId: variantImageUploadResults[index].uploadId,
-        // optionValues: variant.optionValues,
       }));
 
-      // Create variants
       await Promise.all(
         variantsData.map((variant) =>
           variantsService.update(product.id, variant.id, variant)
         )
       );
-      // router.push('/store-product/products');
+      toast.success(`Update product (SKU-${product.sku}) successfully`);
+      router.push('/store-product/products');
     } catch (error) {
       console.error('Error during form submission:', error);
     }
@@ -372,7 +374,10 @@ export default function SingleProduct({ params }: { params: { sku: string } }) {
                     setSelectedOptions={setSelectedOptions}
                   />
                   <div className="pointer-events-none">
-                    <OptionsTable options={selectedOptions} />
+                    <OptionsTable
+                      options={selectedOptions}
+                      setSelectedOptions={setSelectedOptions}
+                    />
                   </div>
                   {/* End */}
                 </div>
