@@ -112,7 +112,6 @@ export default function NewProduct() {
         images.map((image) => uploadsService.uploadFile(image))
       );
 
-      // Prepare product data
       const productData = {
         name,
         slug,
@@ -132,11 +131,8 @@ export default function NewProduct() {
         })),
       };
 
-      // Create product
       const productResponse = await productsService.create(productData);
       const productId = productResponse?.data?.id;
-
-      // Upload product photos
 
       const photosUpload = imageUploadResults.slice(1).map((upload) => ({
         productId,
@@ -239,8 +235,8 @@ export default function NewProduct() {
       return false;
     }
 
-    if (variants && variants.length > 0) {
-      toast.error('Please add at least 100 variants before proceeding.');
+    if (variants && variants.length > 100) {
+      toast.error('Please add less than 100 variants before proceeding.');
       return false;
     }
 

@@ -1,12 +1,12 @@
-import axios from 'axios';
 import { SCHEMA } from '@/constant/schema';
+import axiosInstance from '@/library/axios/axiosConfig';
 
 export const uploadFile = async (file: File) => {
   const formData = new FormData();
   formData.append('file', file);
 
   try {
-    const res = await axios({
+    const res = await axiosInstance({
       method: 'POST',
       url: `${SCHEMA.API_BASE}/uploads`,
       data: formData,
