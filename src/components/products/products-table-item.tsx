@@ -1,8 +1,8 @@
-import ProductActionMenu from '@/app/(default)/store-product/products/product-action';
-import ActionMenu from '@/app/(default)/store-product/products/product-action';
-import Tooltip from '@/components/tooltip';
-import Image from 'next/image';
-import Link from 'next/link';
+import ProductActionMenu from "@/components/products/product-action";
+import ActionMenu from "@/components/products/product-action";
+import Tooltip from "@/components/tooltip";
+import Image from "next/image";
+import Link from "next/link";
 
 interface ProductsTableItemProps {
   product: any;
@@ -24,8 +24,8 @@ export default function ProductsTableItem({
 
   const displayedCategories =
     categoryNames.length > 3
-      ? categoryNames.slice(0, 3).join(', ') + '...'
-      : categoryNames.join(', ');
+      ? categoryNames.slice(0, 3).join(", ") + "..."
+      : categoryNames.join(", ");
 
   return (
     <tr>
@@ -84,7 +84,10 @@ export default function ProductsTableItem({
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="flex gap-2">
           <div className="font-bold text-left text-sky-600">
-            {product.price - (product.price * product.discountPercent) / 100}{' '}
+            {(
+              product.price -
+              (product.price * product.discountPercent) / 100
+            ).toFixed(2)}{" "}
           </div>
           <div className="text-left line-through text-gray">
             {product.price}
@@ -96,7 +99,7 @@ export default function ProductsTableItem({
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
         <div className="font-medium text-left text-green-600">
-          {product.isAvailable ? 'True' : 'False'}
+          {product.isAvailable ? "True" : "False"}
         </div>
       </td>
       <td className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">

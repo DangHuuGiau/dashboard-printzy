@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useItemSelection } from '@/components/utils/use-item-selection';
-import OrdersTableItem from './orders-table-item';
+import { useItemSelection } from "@/components/utils/use-item-selection";
+import OrdersTableItem from "./orders-table-item";
 
 export default function OrdersTable({ orders }: { orders: any[] }) {
   const {
@@ -10,13 +10,12 @@ export default function OrdersTable({ orders }: { orders: any[] }) {
     handleCheckboxChange,
     handleSelectAllChange,
   } = useItemSelection(orders);
-  console.log(orders);
 
   return (
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          All Orders{' '}
+          All Orders{" "}
           <span className="font-medium text-gray-400 dark:text-gray-500">
             442
           </span>

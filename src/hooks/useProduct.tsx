@@ -1,5 +1,5 @@
-import productsService from '@/api/products';
-import { useState, useEffect } from 'react';
+import productsService from "@/api/products";
+import { useState, useEffect } from "react";
 
 const useProduct = (sku: string | string[] | undefined) => {
   const [product, setProduct] = useState<any | null>(null);
@@ -10,14 +10,14 @@ const useProduct = (sku: string | string[] | undefined) => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        if (typeof sku === 'string') {
+        if (typeof sku === "string") {
           const result = await productsService.getOneBySKU(sku);
           setProduct(result?.data);
         } else {
-          throw new Error('Invalid SKU');
+          throw new Error("Invalid SKU");
         }
       } catch (err: any) {
-        setError(err.message || 'Something went wrong');
+        setError(err.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -25,7 +25,7 @@ const useProduct = (sku: string | string[] | undefined) => {
     fetchProduct();
   }, []);
 
-  return product;
+  return { product, loading };
 };
 
 export default useProduct;

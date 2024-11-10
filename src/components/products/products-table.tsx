@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useItemSelection } from '@/components/utils/use-item-selection';
-import ProductsTableItem from './products-table-item';
-import FilterDrawer from './filter-drawer';
+import { useItemSelection } from "@/components/utils/use-item-selection";
+import ProductsTableItem from "./products-table-item";
+import FilterDrawer from "./filter-drawer";
 
 interface Props {
   products: any[];
@@ -26,7 +26,7 @@ export default function ProductsTable({
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="flex items-center justify-between px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          Show products{' '}
+          Show products{" "}
           <span className="font-medium text-gray-400 dark:text-gray-500">
             {products?.length}
           </span>

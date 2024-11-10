@@ -1,5 +1,5 @@
-import productsService from '@/api/products';
-import { useState, useEffect } from 'react';
+import productsService from "@/api/products";
+import { useState, useEffect } from "react";
 
 interface UseProductsParams {
   [key: string]: any;
@@ -37,7 +37,7 @@ const useProducts = ({
         if (isAvailable !== undefined) query.isAvailable = isAvailable;
 
         if (price) {
-          const [minPrice, maxPrice] = price.split('-').map(Number);
+          const [minPrice, maxPrice] = price.split("-").map(Number);
           if (!isNaN(minPrice) && !isNaN(maxPrice)) {
             query.price = { $btw: [minPrice, maxPrice] };
           }
@@ -47,7 +47,7 @@ const useProducts = ({
           if (
             query[key] === null ||
             query[key] === undefined ||
-            query[key] === ''
+            query[key] === ""
           ) {
             delete query[key];
           }
@@ -56,7 +56,7 @@ const useProducts = ({
         const response = await productsService.getList(query);
         setProductsData(response?.data || {});
       } catch (err) {
-        setError('Failed to fetch products.');
+        setError("Failed to fetch products.");
       } finally {
         setLoading(false);
       }
@@ -75,7 +75,7 @@ const useProducts = ({
     isAvailable,
   ]);
 
-  return productsData;
+  return { loading, productsData };
 };
 
 export default useProducts;

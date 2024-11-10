@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
+import Image from "next/image";
 
 interface Props {
   products: any[];
@@ -32,7 +32,6 @@ export default function ProductsInCategory(props: Props) {
                   &times;
                 </div>
               </button>
-              {/* Special Offer label */}
               <div className="absolute bottom-0 right-0 mb-4 mr-4">
                 <div className="inline-flex items-center text-xs font-medium text-gray-100 dark:text-gray-300 bg-gray-900/60 dark:bg-gray-800/60 rounded-full text-center px-2 py-0.5">
                   <span>{index + 1}</span>
@@ -44,7 +43,7 @@ export default function ProductsInCategory(props: Props) {
               {/* Card body */}
               <div className="grow">
                 <header className="mb-2">
-                  <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  <h3 className="mb-1 text-xs font-semibold text-gray-800 truncate dark:text-gray-100">
                     {product?.name}
                   </h3>
                 </header>

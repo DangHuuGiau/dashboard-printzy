@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import ModalBasic from '@/components/modal-basic';
-import useProducts from '@/hooks/useProducts';
-import Image from 'next/image';
+import { useState } from "react";
+import ModalBasic from "@/components/modal-basic";
+import useProducts from "@/hooks/useProducts";
+import Image from "next/image";
 
 interface Props {
   onAddProducts: (product: any[]) => void;
@@ -13,9 +13,9 @@ export default function AddProductsModal(props: Props) {
   const { onAddProducts } = props;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const products = useProducts({ name: searchTerm });
+  const { productsData } = useProducts({ name: searchTerm });
 
   const handleChoiceClick = (product: any) => {
     if (!selectedProducts.includes(product)) {
@@ -71,7 +71,7 @@ export default function AddProductsModal(props: Props) {
                           className="flex items-center justify-center px-2 py-1 m-1 font-medium text-teal-700 bg-teal-100 border border-teal-300 rounded-full"
                         >
                           <div className="flex-initial max-w-full text-xs font-normal leading-none">
-                            {product.name}{' '}
+                            {product.name}{" "}
                             {/* Display product name instead of the object */}
                           </div>
                           <div className="flex flex-row-reverse flex-auto">
@@ -106,8 +106,8 @@ export default function AddProductsModal(props: Props) {
                     </div>
                   </div>
                   <div className="w-full overflow-y-auto bg-white rounded shadow h-28">
-                    {products && products.length > 0 ? (
-                      products.map(
+                    {productsData?.data && productsData?.data?.length > 0 ? (
+                      productsData?.data.map(
                         (product: {
                           id: string;
                           upload: { path: string };
@@ -139,7 +139,9 @@ export default function AddProductsModal(props: Props) {
                       )
                     ) : (
                       <div className="p-4 text-center text-gray-500">
-                        {products ? 'No products available' : 'Loading...'}
+                        {productsData?.data
+                          ? "No products available"
+                          : "Loading..."}
                       </div>
                     )}
                   </div>

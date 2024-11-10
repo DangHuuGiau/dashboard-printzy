@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { SelectedItemsProvider } from '@/app/selected-items-context';
-import DeleteButton from '@/components/delete-button';
-import DateSelect from '@/components/date-select';
-import FilterButton from '@/components/dropdown-filter';
-import OrdersTable from './orders-table';
+import { SelectedItemsProvider } from "@/app/selected-items-context";
+import DeleteButton from "@/components/delete-button";
+import DateSelect from "@/components/date-select";
+import FilterButton from "@/components/dropdown-filter";
+import OrdersTable from "./orders-table";
 
-import { useState } from 'react';
-import useOrders from '@/hooks/useOrders';
-import ProductsPagination from '../../store-product/products/pagination';
+import { useState } from "react";
+import useOrders from "@/hooks/useOrders";
+import ProductsPagination from "../../../../components/products/pagination";
 
 const LIMIT_PER_PAGE = 10;
 function OrdersContent() {

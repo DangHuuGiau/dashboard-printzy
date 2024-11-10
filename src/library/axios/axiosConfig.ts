@@ -20,7 +20,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -28,8 +28,7 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log(error, "error");
     return Promise.reject(error?.response?.data ?? "Something went wrong!");
-  },
+  }
 );
 export default axiosInstance;

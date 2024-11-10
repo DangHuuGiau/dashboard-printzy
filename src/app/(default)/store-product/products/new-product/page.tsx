@@ -1,42 +1,45 @@
-'use client';
+"use client";
 
-import AddOptionsModal from '@/components/products/new-product/modal-add-options';
-const CKEditorComponent = dynamic(() => import('@/components/ckeditor-input'), {
+import AddOptionsModal from "@/components/products/new-product/modal-add-options";
+const CKEditorComponent = dynamic(() => import("@/components/ckeditor-input"), {
   ssr: false,
 });
-import MockupUpload from '@/components/products/new-product/mockup-upload';
-import OptionsTable from '@/components/products/new-product/options-table';
-import VariantsTable from '@/components/products/new-product/variants-table';
-import { useEffect, useState } from 'react';
-import useCategories from '@/hooks/useCategories';
-import useCollections from '@/hooks/useCollections';
-import uploadsService from '@/api/uploads';
-import productsService from '@/api/products';
-import photosService from '@/api/photos';
-import VariantsEditModal from '@/components/products/new-product/variant-edit-modal';
-import variantsService from '@/api/variants';
-import { useRouter } from 'next/navigation';
-import { useConfirm } from '@/contexts/modal/ConfirmContext';
-import ConfirmModal from '@/components/ui/confirm-modal';
-import dynamic from 'next/dynamic';
-import Banner02 from '@/components/banner-02';
-import { toast } from 'react-toastify';
+import MockupUpload from "@/components/products/new-product/mockup-upload";
+import OptionsTable from "@/components/products/new-product/options-table";
+import VariantsTable from "@/components/products/new-product/variants-table";
+import { useEffect, useState } from "react";
+import useCategories from "@/hooks/useCategories";
+import useCollections from "@/hooks/useCollections";
+import uploadsService from "@/api/uploads";
+import productsService from "@/api/products";
+import photosService from "@/api/photos";
+import VariantsEditModal from "@/components/products/new-product/variant-edit-modal";
+import variantsService from "@/api/variants";
+import { useRouter } from "next/navigation";
+import { useConfirm } from "@/contexts/modal/ConfirmContext";
+import ConfirmModal from "@/components/ui/confirm-modal";
+import dynamic from "next/dynamic";
+import { toast } from "react-toastify";
 
 export default function NewProduct() {
   const router = useRouter();
   const { confirm } = useConfirm();
 
-  const categories = useCategories();
+  const { categories } = useCategories();
+
+  console.log(categories);
+
   const collections = useCollections();
 
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [price, setPrice] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collectionId, setCollectionId] = useState<number | null>(null);
   const [trackingVariant, setTrackingVariant] = useState(false);
+  const [savingStatus, setSavingStatus] = useState(false);
 
   const [images, setImages] = useState<File[]>([]);
 
@@ -50,12 +53,12 @@ export default function NewProduct() {
       if (index === options.length) {
         const variant = {
           price: price || 0,
-          baseCost: price - 5 || 0,
+          baseCost: price === 0 ? price : price - 5 || 0,
           isAvailable: true,
           isInStock: true,
           sku: currentVariant
             .map((optionValue: any) => optionValue.value)
-            .join('-'),
+            .join("-"),
           uploadId: 0,
           optionValues: currentVariant.map((optionValue: any) => ({
             optionId: optionValue.optionId,
@@ -91,8 +94,8 @@ export default function NewProduct() {
   useEffect(() => {
     const generatedSlug = name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
     setSlug(generatedSlug);
   }, [name]);
@@ -107,7 +110,7 @@ export default function NewProduct() {
   const handleFormSubmit = async () => {
     try {
       handleCheckValid();
-
+      setSavingStatus(true);
       const imageUploadResults = await Promise.all(
         images.map((image) => uploadsService.uploadFile(image))
       );
@@ -165,9 +168,10 @@ export default function NewProduct() {
         )
       );
       toast.success(`Create product successfully`);
-      router.push('/store-product/products');
+      setSavingStatus(false);
+      router.push("/store-product/products");
     } catch (error) {
-      console.error('Error during form submission:', error);
+      console.error("Error during form submission:", error);
     }
   };
 
@@ -193,50 +197,44 @@ export default function NewProduct() {
     confirm({
       title: `Are you sure?`,
       message: `You've made some changes. Are you sure you want to discard them?`,
-      action: 'Discard Change',
-      onConfirm: () => router.push('/store-product/products'),
+      action: "Discard Change",
+      onConfirm: () => router.push("/store-product/products"),
     });
   };
 
   const handleCheckValid = () => {
-    // Check if name is provided
     if (!name.trim()) {
-      toast.error('Product name is required');
+      toast.error("Product name is required");
       return false;
     }
 
-    // Check if price is valid
     if (price <= 0 || isNaN(price)) {
-      toast.error('Price must be a valid positive number');
+      toast.error("Price must be a valid positive number");
       return false;
     }
 
-    // Ensure discount is within range
     if (discountPercent < 0 || discountPercent > 100) {
-      toast.error('Discount percent must be between 0 and 100');
+      toast.error("Discount percent must be between 0 and 100");
       return false;
     }
 
-    // Check if at least one category is selected
     if (categoryIds.length === 0) {
-      toast.error('At least one category must be selected');
+      toast.error("At least one category must be selected");
       return false;
     }
 
-    // Check if images are uploaded
     if (images.length === 0) {
-      toast.error('At least one product image is required');
+      toast.error("At least one product image is required");
       return false;
     }
 
-    // Check if selected options have valid values (optional)
     if (selectedOptions.some((option) => option.optionValues.length === 0)) {
-      toast.error('Each selected option must have at least one value');
+      toast.error("Each selected option must have at least one value");
       return false;
     }
 
     if (variants && variants.length > 100) {
-      toast.error('Please add less than 100 variants before proceeding.');
+      toast.error("Please add less than 100 variants before proceeding.");
       return false;
     }
 
@@ -257,7 +255,7 @@ export default function NewProduct() {
             className="text-gray-100 bg-gray-900 btn-sm hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
             onClick={handleFormSubmit}
           >
-            Save
+            {savingStatus ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
@@ -386,7 +384,7 @@ export default function NewProduct() {
                         // Ensure the value is between 0 and 100
                         if (value >= 0 && value <= 100) {
                           setDiscountPercent(value);
-                        } else if (e.target.value === '') {
+                        } else if (e.target.value === "") {
                           // Allow clearing the input
                           setDiscountPercent(0);
                         }
@@ -511,7 +509,7 @@ export default function NewProduct() {
                       {/* End */}
                     </div>
 
-                    {categories.map((category) => (
+                    {categories?.map((category) => (
                       <div
                         className="text-sm"
                         key={`select-category-${category.name}`}

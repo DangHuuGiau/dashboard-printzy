@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import categoriesService from '@/api/categories';
+import { useState, useEffect } from "react";
+import categoriesService from "@/api/categories";
 
 const useCategory = (id: string) => {
   const [category, setCategory] = useState<any>({});
@@ -12,7 +12,7 @@ const useCategory = (id: string) => {
         const response = await categoriesService.getOne(id);
         setCategory(response?.data || {});
       } catch (err) {
-        setError('Failed to fetch category.');
+        setError("Failed to fetch category.");
       } finally {
         setLoading(false);
       }
@@ -21,7 +21,7 @@ const useCategory = (id: string) => {
     fetchCategory();
   }, []);
 
-  return category;
+  return { category, loading };
 };
 
 export default useCategory;

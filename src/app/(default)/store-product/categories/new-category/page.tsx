@@ -1,24 +1,26 @@
-'use client';
+"use client";
 
-import categoriesService from '@/api/categories';
-import uploadsService from '@/api/uploads';
-import CategoryImageUpload from '@/components/categories/category-upload-image';
-import AddProductsModal from '@/components/categories/modal-add-product';
-import ProductsInCategory from '@/components/categories/products-in-category';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-const CKEditorComponent = dynamic(() => import('@/components/ckeditor-input'), {
+import categoriesService from "@/api/categories";
+import uploadsService from "@/api/uploads";
+import CategoryImageUpload from "@/components/categories/category-upload-image";
+import AddProductsModal from "@/components/categories/modal-add-product";
+import ProductsInCategory from "@/components/categories/products-in-category";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "react-toastify";
+const CKEditorComponent = dynamic(() => import("@/components/ckeditor-input"), {
   ssr: false,
 });
 
 export default function NewCategory() {
   const router = useRouter();
 
-  const [categoryName, setCategoryName] = useState('');
+  const [categoryName, setCategoryName] = useState("");
   const [categoryImage, setCategoryImage] = useState<File | null>(null);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleImageUpload = (image: File | null) => {
     setCategoryImage(image);
@@ -34,8 +36,30 @@ export default function NewCategory() {
     );
   };
 
+  const validateForm = () => {
+    if (!categoryName.trim()) {
+      toast.error("Category name is required.");
+      return false;
+    }
+    if (!categoryImage) {
+      toast.error("Category image is required.");
+      return false;
+    }
+    if (!description.trim()) {
+      toast.error("Description is required.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
     if (categoryImage) {
       const uploadData = await uploadsService.uploadFile(categoryImage);
       const newCategory = {
@@ -48,11 +72,12 @@ export default function NewCategory() {
             : null,
       };
       await categoriesService.create(newCategory);
-      router.push('/store-product/categories');
+      setLoading(false);
+      router.push("/store-product/categories");
     }
   };
   const handleCancel = () => {
-    router.push('/store-product/categories');
+    router.push("/store-product/categories");
   };
 
   return (
@@ -71,7 +96,7 @@ export default function NewCategory() {
               type="submit"
               className="text-gray-100 bg-gray-900 btn-sm hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </div>

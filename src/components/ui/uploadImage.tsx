@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 interface ImageUploadProps {
   image?: any;
-  variantIndex: number;
-  onImageUpload: (variantIndex: number, image: File | null) => void;
-  onDeleteImage: (variantIndex: number) => void;
+  variantIndex: any;
+  onImageUpload: (variantIndex: any, image: File | null) => void;
+  onDeleteImage: (variantIndex: any) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -15,10 +15,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       onImageUpload(variantIndex, file);
     } else {
-      alert('Please upload a valid image file');
+      alert("Please upload a valid image file");
     }
   };
 

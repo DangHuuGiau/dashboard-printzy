@@ -1,22 +1,38 @@
-'use client';
+"use client";
 
-import categoriesService from '@/api/categories';
-import CategoryActionMenu from '@/components/categories/action';
-import ConfirmModal from '@/components/ui/confirm-modal';
-import { useConfirm } from '@/contexts/modal/ConfirmContext';
-import useCategories from '@/hooks/useCategories';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
+import categoriesService from "@/api/categories";
+import Loading from "@/app/loading";
+import CategoryActionMenu from "@/components/categories/action";
+import ConfirmModal from "@/components/ui/confirm-modal";
+import { useConfirm } from "@/contexts/modal/ConfirmContext";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Categories() {
   const { confirm } = useConfirm();
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const categories = useCategories({ name: searchTerm });
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCategories = async () => {
+    setLoading(true);
+    const query: any = {};
+    query.name = { $iLike: `%${searchTerm}%` };
+
+    const response = await categoriesService.getList(query);
+    setCategories(response?.data?.data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [searchTerm]);
 
   const handleDelete = async (id: number) => {
     await categoriesService.deleteOne(id);
+    fetchCategories();
   };
 
   const onConfirmDelete = (name: string, id: number) => {
@@ -64,7 +80,7 @@ export default function Categories() {
           </div>
 
           <Link
-            href={'/store-product/categories/new-category'}
+            href={"/store-product/categories/new-category"}
             className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
           >
             <svg
@@ -79,42 +95,48 @@ export default function Categories() {
           </Link>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-6">
-        {categories.map((category) => (
-          <div
-            // href={`/store-product/categories/${category.id}`}
-            className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 rounded-xl"
-            key={`category-${category.id}`}
-          >
-            <div className="flex flex-col h-52">
-              {/* Image */}
-              <div className="relative w-full h-full">
-                <Image
-                  className="object-cover w-full h-full"
-                  src={category?.upload?.path}
-                  width={301}
-                  height={226}
-                  alt={category.name}
-                />
-                <div className="absolute left-0 mb-4 ml-4 top-5">
-                  <div className="inline-flex items-center text-base font-medium text-gray-100 dark:text-gray-300 bg-gray-900/60 dark:bg-gray-800/60 rounded-full text-center px-2 py-0.5">
-                    <span>
-                      {category.name} - {category.categoryProducts?.length}
-                    </span>
-                  </div>
-                </div>
-                <div className="absolute right-0 mb-4 mr-4 top-4">
-                  <CategoryActionMenu
-                    align="right"
-                    id={category.id}
-                    onDelete={() => onConfirmDelete(category.name, category.id)}
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="grid grid-cols-4 gap-6">
+          {categories.map((category) => (
+            <div
+              // href={`/store-product/categories/${category.id}`}
+              className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 rounded-xl"
+              key={`category-${category.id}`}
+            >
+              <div className="flex flex-col h-52">
+                {/* Image */}
+                <div className="relative w-full h-full">
+                  <Image
+                    className="object-cover w-full h-full"
+                    src={category?.upload?.path}
+                    width={301}
+                    height={226}
+                    alt={category.name}
                   />
+                  <div className="absolute left-0 mb-4 ml-4 top-5">
+                    <div className="inline-flex items-center text-base font-medium text-gray-100 dark:text-gray-300 bg-gray-900/60 dark:bg-gray-800/60 rounded-full text-center px-2 py-0.5">
+                      <span>
+                        {category.name} - {category.categoryProducts?.length}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="absolute right-0 mb-4 mr-4 top-4">
+                    <CategoryActionMenu
+                      align="right"
+                      id={category.id}
+                      onDelete={() =>
+                        onConfirmDelete(category.name, category.id)
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       <ConfirmModal />
     </div>
   );

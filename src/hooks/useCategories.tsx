@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import categoriesService from '@/api/categories';
+import { useState, useEffect } from "react";
+import categoriesService from "@/api/categories";
 interface Params {
-  name?: string; // Make name optional
+  name?: string;
 }
 
 const useCategories = ({ name }: Params = {}) => {
@@ -18,7 +18,7 @@ const useCategories = ({ name }: Params = {}) => {
         const response = await categoriesService.getList(query);
         setCategories(response?.data?.data || []);
       } catch (err) {
-        setError('Failed to fetch categories.');
+        setError("Failed to fetch categories.");
       } finally {
         setLoading(false);
       }
@@ -27,7 +27,7 @@ const useCategories = ({ name }: Params = {}) => {
     fetchCategories();
   }, [name]);
 
-  return categories;
+  return { categories, loading };
 };
 
 export default useCategories;
