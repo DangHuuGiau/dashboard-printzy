@@ -3,7 +3,13 @@
 import { useItemSelection } from "@/components/utils/use-item-selection";
 import OrdersTableItem from "./orders-table-item";
 
-export default function OrdersTable({ orders }: { orders: any[] }) {
+export default function OrdersTable({
+  orders,
+  total,
+}: {
+  orders: any[];
+  total: number;
+}) {
   const {
     selectedItems,
     isAllSelected,
@@ -17,7 +23,7 @@ export default function OrdersTable({ orders }: { orders: any[] }) {
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
           All Orders{" "}
           <span className="font-medium text-gray-400 dark:text-gray-500">
-            442
+            {total || 0}
           </span>
         </h2>
       </header>
@@ -64,6 +70,9 @@ export default function OrdersTable({ orders }: { orders: any[] }) {
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <div className="font-semibold text-left">Payment type</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold text-left">Actions</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <span className="sr-only">Menu</span>

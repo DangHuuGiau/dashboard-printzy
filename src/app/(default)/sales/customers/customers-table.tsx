@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import { useItemSelection } from '@/components/utils/use-item-selection';
-import OrdersTableItem from './customers-table-item';
+import { useItemSelection } from "@/components/utils/use-item-selection";
+import OrdersTableItem from "./customers-table-item";
 
-export default function CustomersTable({ customers }: { customers: any[] }) {
+export default function CustomersTable({
+  customers,
+  total,
+}: {
+  customers: any[];
+  total: number;
+}) {
   const {
     selectedItems,
     isAllSelected,
@@ -15,9 +21,9 @@ export default function CustomersTable({ customers }: { customers: any[] }) {
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          All Orders{' '}
+          All Customers{" "}
           <span className="font-medium text-gray-400 dark:text-gray-500">
-            442
+            {total || 0}
           </span>
         </h2>
       </header>
@@ -63,6 +69,9 @@ export default function CustomersTable({ customers }: { customers: any[] }) {
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <div className="font-semibold text-left">Status</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold text-left">Actions</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <span className="sr-only">Menu</span>

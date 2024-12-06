@@ -1,43 +1,43 @@
-'use client';
+"use client";
 
-import AuthHeader from '../auth-header';
-import AuthImage from '../auth-image';
-import Cookies from 'js-cookie';
-import { redirect } from 'next/navigation';
-import { useState } from 'react';
-import { login } from '@/api/auth';
-import { useUserStore } from '@/store/user/user.store';
+import AuthHeader from "../auth-header";
+import AuthImage from "../auth-image";
+import Cookies from "js-cookie";
+import { redirect } from "next/navigation";
+import { useState } from "react";
+import { login } from "@/api/auth";
+import { useUserStore } from "@/store/user/user.store";
 
 export default function SignIn() {
   const { setUser } = useUserStore();
-  const isLoggedIn = Cookies.get('printzy_ac_token');
+  const isLoggedIn = Cookies.get("printzy_ac_token");
   if (isLoggedIn) {
-    redirect('/');
+    redirect("/");
   }
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       const response = await login({ email, password });
       const token = response?.data?.payload;
       const role = response?.data?.user?.role;
 
-      if (token && role === 'admin') {
-        Cookies.set('printzy_refresh_token', token.refreshToken);
-        Cookies.set('printzy_ac_token', token.refreshToken);
+      if (token && (role === "admin" || role === "employee")) {
+        Cookies.set("printzy_refresh_token", token.refreshToken);
+        Cookies.set("printzy_ac_token", token.refreshToken);
         setUser(response?.data?.user);
-        redirect('/');
+        redirect("/");
       } else {
-        setError('Login failed. Please check your email and password.');
+        setError("Login failed. Please check your email and password.");
       }
     } catch (err: any) {
-      setError('Login failed. Please check your email and password.');
+      setError("Login failed. Please check your email and password.");
     }
   };
 
