@@ -1,11 +1,11 @@
-import useCategories from "@/hooks/useCategories";
-import useCollections from "@/hooks/useCollections";
-import { useState } from "react";
+import useCategories from '@/hooks/useCategories';
+import useCollections from '@/hooks/useCollections';
+import { useState } from 'react';
 
 const inventoryOption = [
-  { id: 1, name: "All", value: undefined },
-  { id: 2, name: "On sale", value: true },
-  { id: 3, name: "Out of sale", value: false },
+  { id: 1, name: 'All', value: undefined },
+  { id: 2, name: 'On sale', value: true },
+  { id: 3, name: 'Out of sale', value: false },
 ];
 
 interface Props {
@@ -24,11 +24,17 @@ export default function FilterDrawer({ filterParams, setFilterParams }: Props) {
   const [priceRange, setPriceRange] = useState<number>(0);
 
   const handleCategoryChange = (categoryId: number) => {
-    setCategoryIds((prevIds) =>
-      prevIds.includes(categoryId)
+    // Update the list of selected category IDs
+    setCategoryIds((prevIds) => {
+      const newIds = prevIds.includes(categoryId)
         ? prevIds.filter((id) => id !== categoryId)
-        : [...prevIds, categoryId]
-    );
+        : [...prevIds, categoryId];
+      setFilterParams({
+        ...filterParams,
+        categoryId: newIds,
+      });
+      return newIds;
+    });
   };
 
   const handleInventoryChange = (id: number, value: boolean | undefined) => {
@@ -67,7 +73,7 @@ export default function FilterDrawer({ filterParams, setFilterParams }: Props) {
       {/* Drawer component */}
       <div
         className={`fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         } bg-white w-80 dark:bg-gray-800`}
       >
         <h5 className="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
@@ -134,7 +140,7 @@ export default function FilterDrawer({ filterParams, setFilterParams }: Props) {
             <input
               type="range"
               min="0"
-              max="100"
+              max="1000000"
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none dark:bg-gray-700"
               value={priceRange}
               onChange={handlePriceChange}

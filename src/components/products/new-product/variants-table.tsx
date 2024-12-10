@@ -1,6 +1,6 @@
-import React from "react";
-import ImageUpload from "@/components/ui/uploadImage";
-import Banner02 from "@/components/banner-02";
+import React from 'react';
+import ImageUpload from '@/components/ui/uploadImage';
+import Banner02 from '@/components/banner-02';
 
 interface Props {
   variants: any[];
@@ -16,8 +16,8 @@ const VariantsTable = (props: Props) => {
   };
 
   const groupedData = variants.reduce((acc, item) => {
-    const size = findOptionValue(item.optionValues, 2);
-    const color = findOptionValue(item.optionValues, 3);
+    const size = findOptionValue(item.optionValues, 3);
+    const color = findOptionValue(item.optionValues, 1);
     const key = `Size ${size}, Color ${color}`;
     if (!acc[key]) {
       acc[key] = [];
@@ -34,6 +34,27 @@ const VariantsTable = (props: Props) => {
           : variant
       )
     );
+  };
+
+  const handleCustomizeModelUpdate = (
+    groupKey: string,
+    customizeModel: string
+  ) => {
+    setVariants(
+      variants.map((variant) =>
+        groupedData[groupKey].includes(variant)
+          ? { ...variant, customizeModel }
+          : variant
+      )
+    );
+  };
+
+  const handleTextareaChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    groupKey: string
+  ) => {
+    const updatedCustomizeModel = e.target.value;
+    handleCustomizeModelUpdate(groupKey, updatedCustomizeModel);
   };
 
   const handleGroupImageDelete = (groupKey: string) => {
@@ -63,9 +84,6 @@ const VariantsTable = (props: Props) => {
                 <span className="sr-only">Image</span>
               </th>
               <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                <div className="font-semibold text-left">Variant</div>
-              </th>
-              <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                 <div className="font-semibold text-left">SKU</div>
               </th>
               <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
@@ -76,6 +94,9 @@ const VariantsTable = (props: Props) => {
               </th>
               <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                 <span className="font-semibold text-left">Visibility</span>
+              </th>
+              <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                <span className="font-semibold text-left">Customize JSON</span>
               </th>
             </tr>
           </thead>
@@ -95,12 +116,9 @@ const VariantsTable = (props: Props) => {
                     />
                   </td>
                   <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                    <div className="text-left">{groupKey}</div>
-                  </td>
-                  <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                     <div className="text-left">
                       {groupItems.map((item: any) => (
-                        <div className="mt-2">{item.sku}</div>
+                        <div className="mt-2 text-left">{item.sku}</div>
                       ))}
                     </div>
                   </td>
@@ -115,13 +133,13 @@ const VariantsTable = (props: Props) => {
                     <div className="text-left">
                       {groupItems.map((item: any) => (
                         <div className="mt-2">
-                          {item?.isInStock ? "In stock" : "Out of stock"}
+                          {item?.isInStock ? 'In stock' : 'Out of stock'}
                         </div>
                       ))}
                     </div>
                   </td>
                   <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                    <div className="flex flex-col justify-center gap-2 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 text-center">
                       {groupItems.map((item: any) => (
                         <div className="mt-2">
                           {item?.isAvailable ? (
@@ -153,6 +171,17 @@ const VariantsTable = (props: Props) => {
                           )}
                         </div>
                       ))}
+                    </div>
+                  </td>
+                  <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                    <div className="text-left">
+                      <div className="mt-2">
+                        <textarea
+                          className="rounded-md resize"
+                          value={groupItems[0]?.customizeModel}
+                          onChange={(e) => handleTextareaChange(e, groupKey)}
+                        />
+                      </div>
                     </div>
                   </td>
                 </tr>

@@ -106,7 +106,7 @@ export default function VariantsEditModal(props: Props) {
                             id="prefix"
                             className="w-full pl-12 form-input"
                             type="number"
-                            step="0.01"
+                            step="1000"
                             value={variant.price}
                             onChange={(e) =>
                               handleInputChange(
@@ -118,7 +118,7 @@ export default function VariantsEditModal(props: Props) {
                           />
                           <div className="absolute inset-0 right-auto flex items-center pointer-events-none">
                             <span className="px-3 text-sm font-medium text-gray-400 dark:text-gray-500">
-                              USD
+                              VND
                             </span>
                           </div>
                         </div>
@@ -130,7 +130,7 @@ export default function VariantsEditModal(props: Props) {
                             id="prefix"
                             className="w-full pl-12 form-input"
                             type="number"
-                            step="0.01"
+                            step="1000"
                             value={variant.baseCost}
                             onChange={(e) =>
                               handleInputChange(
@@ -142,7 +142,7 @@ export default function VariantsEditModal(props: Props) {
                           />
                           <div className="absolute inset-0 right-auto flex items-center pointer-events-none">
                             <span className="px-3 text-sm font-medium text-gray-400 dark:text-gray-500">
-                              USD
+                              VND
                             </span>
                           </div>
                         </div>

@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import AddOptionsModal from "@/components/products/new-product/modal-add-options";
-const CKEditorComponent = dynamic(() => import("@/components/ckeditor-input"), {
+import AddOptionsModal from '@/components/products/new-product/modal-add-options';
+const CKEditorComponent = dynamic(() => import('@/components/ckeditor-input'), {
   ssr: false,
 });
-import MockupUpload from "@/components/products/new-product/mockup-upload";
-import OptionsTable from "@/components/products/new-product/options-table";
-import VariantsTable from "@/components/products/new-product/variants-table";
-import { useEffect, useState } from "react";
-import useCategories from "@/hooks/useCategories";
-import useCollections from "@/hooks/useCollections";
-import uploadsService from "@/api/uploads";
-import productsService from "@/api/products";
-import photosService from "@/api/photos";
-import VariantsEditModal from "@/components/products/new-product/variant-edit-modal";
-import variantsService from "@/api/variants";
-import { useRouter } from "next/navigation";
-import { useConfirm } from "@/contexts/modal/ConfirmContext";
-import ConfirmModal from "@/components/ui/confirm-modal";
-import dynamic from "next/dynamic";
-import { toast } from "react-toastify";
+import MockupUpload from '@/components/products/new-product/mockup-upload';
+import OptionsTable from '@/components/products/new-product/options-table';
+import VariantsTable from '@/components/products/new-product/variants-table';
+import { useEffect, useState } from 'react';
+import useCategories from '@/hooks/useCategories';
+import useCollections from '@/hooks/useCollections';
+import uploadsService from '@/api/uploads';
+import productsService from '@/api/products';
+import photosService from '@/api/photos';
+import VariantsEditModal from '@/components/products/new-product/variant-edit-modal';
+import variantsService from '@/api/variants';
+import { useRouter } from 'next/navigation';
+import { useConfirm } from '@/contexts/modal/ConfirmContext';
+import ConfirmModal from '@/components/ui/confirm-modal';
+import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
 
 export default function NewProduct() {
   const router = useRouter();
@@ -29,11 +29,11 @@ export default function NewProduct() {
 
   const collections = useCollections();
 
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
   const [price, setPrice] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState('');
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [collectionId, setCollectionId] = useState<number | null>(null);
   const [trackingVariant, setTrackingVariant] = useState(false);
@@ -56,12 +56,13 @@ export default function NewProduct() {
           isInStock: true,
           sku: currentVariant
             .map((optionValue: any) => optionValue.value)
-            .join("-"),
+            .join('-'),
           uploadId: 0,
           optionValues: currentVariant.map((optionValue: any) => ({
             optionId: optionValue.optionId,
             valueId: optionValue.optionValueId.id,
           })),
+          customizeModel: '',
         };
         variants.push(variant);
         return;
@@ -92,8 +93,8 @@ export default function NewProduct() {
   useEffect(() => {
     const generatedSlug = name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
     setSlug(generatedSlug);
   }, [name]);
@@ -142,13 +143,16 @@ export default function NewProduct() {
 
       await photosService.createMany(photosUpload);
 
-      const variantImageUploadResults = await Promise.all(
-        variants.map((variant) =>
-          variant?.image
-            ? uploadsService.uploadFile(variant.image)
-            : Promise.resolve({ id: null })
-        )
-      );
+      const variantImageUploadResults: any[] = [];
+
+      for (const variant of variants) {
+        if (variant?.image) {
+          const result = await uploadsService.uploadFile(variant.image);
+          variantImageUploadResults.push(result);
+        } else {
+          variantImageUploadResults.push({ id: null });
+        }
+      }
 
       const variantsData = variants.map((variant, index) => ({
         price: variant.price,
@@ -158,6 +162,9 @@ export default function NewProduct() {
         isInStock: variant.isInStock,
         uploadId: variantImageUploadResults[index].id,
         optionValues: variant.optionValues,
+        customizeModel: variant.customizeModel
+          ? JSON.parse(variant.customizeModel)
+          : null,
       }));
 
       await Promise.all(
@@ -167,9 +174,9 @@ export default function NewProduct() {
       );
       toast.success(`Create product successfully`);
       setSavingStatus(false);
-      router.push("/store-product/products");
+      router.push('/store-product/products');
     } catch (error) {
-      console.error("Error during form submission:", error);
+      console.error('Error during form submission:', error);
     }
   };
 
@@ -195,44 +202,44 @@ export default function NewProduct() {
     confirm({
       title: `Are you sure?`,
       message: `You've made some changes. Are you sure you want to discard them?`,
-      action: "Discard Change",
-      onConfirm: () => router.push("/store-product/products"),
+      action: 'Discard Change',
+      onConfirm: () => router.push('/store-product/products'),
     });
   };
 
   const handleCheckValid = () => {
     if (!name.trim()) {
-      toast.error("Product name is required");
+      toast.error('Product name is required');
       return false;
     }
 
     if (price <= 0 || isNaN(price)) {
-      toast.error("Price must be a valid positive number");
+      toast.error('Price must be a valid positive number');
       return false;
     }
 
     if (discountPercent < 0 || discountPercent > 100) {
-      toast.error("Discount percent must be between 0 and 100");
+      toast.error('Discount percent must be between 0 and 100');
       return false;
     }
 
     if (categoryIds.length === 0) {
-      toast.error("At least one category must be selected");
+      toast.error('At least one category must be selected');
       return false;
     }
 
     if (images.length === 0) {
-      toast.error("At least one product image is required");
+      toast.error('At least one product image is required');
       return false;
     }
 
     if (selectedOptions.some((option) => option.optionValues.length === 0)) {
-      toast.error("Each selected option must have at least one value");
+      toast.error('Each selected option must have at least one value');
       return false;
     }
 
     if (variants && variants.length > 100) {
-      toast.error("Please add less than 100 variants before proceeding.");
+      toast.error('Please add less than 100 variants before proceeding.');
       return false;
     }
 
@@ -253,7 +260,7 @@ export default function NewProduct() {
             className="text-gray-100 bg-gray-900 btn-sm hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
             onClick={handleFormSubmit}
           >
-            {savingStatus ? "Saving..." : "Save"}
+            {savingStatus ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>
@@ -351,13 +358,13 @@ export default function NewProduct() {
                         id="prefix"
                         className="w-full pl-12 form-input"
                         type="number"
-                        step="0.01"
+                        step="10000"
                         value={price}
                         onChange={(e) => setPrice(parseFloat(e.target.value))}
                       />
                       <div className="absolute inset-0 right-auto flex items-center pointer-events-none">
                         <span className="px-3 text-sm font-medium text-gray-400 dark:text-gray-500">
-                          USD
+                          VND
                         </span>
                       </div>
                     </div>
@@ -382,7 +389,7 @@ export default function NewProduct() {
                         // Ensure the value is between 0 and 100
                         if (value >= 0 && value <= 100) {
                           setDiscountPercent(value);
-                        } else if (e.target.value === "") {
+                        } else if (e.target.value === '') {
                           // Allow clearing the input
                           setDiscountPercent(0);
                         }
@@ -470,8 +477,6 @@ export default function NewProduct() {
                           variants={variants}
                           setVariants={setVariants}
                         />
-
-                        {/* End */}
                       </div>
                     </div>
                   </>

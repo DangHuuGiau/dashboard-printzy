@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { SelectedItemsProvider } from "@/app/selected-items-context";
-import DeleteButton from "@/components/delete-button";
-import useProducts from "@/hooks/useProducts";
-import Link from "next/link";
-import MoreActionsSelect from "@/components/products/more-actions-select";
-import { useState } from "react";
-import ProductsPagination from "../../../../components/products/pagination";
-import ProductsTable from "@/components/products/products-table";
-import Loading from "@/app/loading";
+import { SelectedItemsProvider } from '@/app/selected-items-context';
+import DeleteButton from '@/components/delete-button';
+import useProducts from '@/hooks/useProducts';
+import Link from 'next/link';
+import MoreActionsSelect from '@/components/products/more-actions-select';
+import { useState } from 'react';
+import ProductsPagination from '../../../../components/products/pagination';
+import ProductsTable from '@/components/products/products-table';
+import Loading from '@/app/loading';
 
 const LIMIT_PER_PAGE = 10;
 function ProductsContent() {
@@ -39,9 +39,8 @@ function ProductsContent() {
             {/* Dropdown */}
             <MoreActionsSelect />
 
-            {/* Add customer button */}
             <Link
-              href={"/store-product/products/new-product"}
+              href={'/store-product/products/new-product'}
               className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
             >
               <svg
@@ -56,28 +55,26 @@ function ProductsContent() {
             </Link>
           </div>
         </div>
-        {loading ? (
-          <Loading />
-        ) : (
-          <div>
-            <ProductsTable
-              products={productsData?.data}
+
+        <div>
+          <ProductsTable
+            products={productsData?.data}
+            loading={loading}
+            filterParams={filterParams}
+            setFilterParams={setFilterParams}
+          />
+          <div className="mt-8">
+            <ProductsPagination
               filterParams={filterParams}
               setFilterParams={setFilterParams}
+              data={{
+                limit: productsData?.$limit,
+                skip: productsData?.$skip,
+                total: productsData?.total,
+              }}
             />
-            <div className="mt-8">
-              <ProductsPagination
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-                data={{
-                  limit: productsData?.$limit,
-                  skip: productsData?.$skip,
-                  total: productsData?.total,
-                }}
-              />
-            </div>
           </div>
-        )}
+        </div>
         {/* Pagination */}
       </div>
     </>
