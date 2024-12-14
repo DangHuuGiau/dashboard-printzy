@@ -5,7 +5,14 @@ interface UseOrdersParams {
   [key: string]: any;
 }
 
-const useOrders = ({ limit, skip, name }: UseOrdersParams) => {
+const useOrders = ({
+  limit,
+  skip,
+  startDate,
+  endDate,
+  status,
+  orderNumber,
+}: UseOrdersParams) => {
   const [ordersData, setOrdersData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +27,12 @@ const useOrders = ({ limit, skip, name }: UseOrdersParams) => {
 
         if (limit !== undefined) query.$limit = limit;
         if (skip !== undefined) query.$skip = skip;
-        if (name) query.name = { $iLike: `%${name}%` };
+        if (orderNumber) query.orderNumber = { $iLike: `%${orderNumber}%` };
+        if (status !== undefined) query.status = status;
+
+        if (startDate && endDate) {
+          query.createdAt = { $btw: [startDate, endDate] };
+        }
 
         Object.keys(query).forEach((key) => {
           if (
@@ -42,7 +54,7 @@ const useOrders = ({ limit, skip, name }: UseOrdersParams) => {
     };
 
     fetchOrders();
-  }, [limit, skip, name]);
+  }, [limit, skip, orderNumber, startDate, endDate, status]);
 
   return ordersData;
 };

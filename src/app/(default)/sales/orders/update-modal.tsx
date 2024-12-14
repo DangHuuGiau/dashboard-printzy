@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import ModalBasic from "@/components/modal-basic";
+import ModalBasic from '@/components/modal-basic';
 
 function calculateTotal(purchases: any[]): number {
   return purchases?.reduce((total, purchase) => {
@@ -33,7 +33,7 @@ export default function UpdateOrdersModal({
                 type="text"
                 required
                 disabled
-                value={`#${order.orderNumber}`}
+                value={`#${order?.orderNumber}`}
               />
             </div>
             <div>
@@ -46,7 +46,7 @@ export default function UpdateOrdersModal({
                 type="text"
                 required
                 disabled
-                value={calculateTotal(order.purchases) || order?.total}
+                value={calculateTotal(order?.purchases) || order?.total}
               />
             </div>
             <div>

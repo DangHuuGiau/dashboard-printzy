@@ -1,8 +1,10 @@
-import ProductActionMenu from "@/components/products/product-action";
-import ActionMenu from "@/components/products/product-action";
-import Tooltip from "@/components/tooltip";
-import Image from "next/image";
-import Link from "next/link";
+import productsService from '@/api/products';
+import ProductActionMenu from '@/components/products/product-action';
+import ActionMenu from '@/components/products/product-action';
+import Tooltip from '@/components/tooltip';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
 
 interface ProductsTableItemProps {
   product: any;
@@ -24,8 +26,15 @@ export default function ProductsTableItem({
 
   const displayedCategories =
     categoryNames.length > 3
-      ? categoryNames.slice(0, 3).join(", ") + "..."
-      : categoryNames.join(", ");
+      ? categoryNames.slice(0, 3).join(', ') + '...'
+      : categoryNames.join(', ');
+
+  const [isOnSale, setIsOnSale] = useState(product.isAvailable);
+
+  const onChangeIsSale = async () => {
+    await productsService.update(product.id, { isAvailable: !isOnSale });
+    setIsOnSale(!isOnSale);
+  };
 
   return (
     <tr>
@@ -87,7 +96,7 @@ export default function ProductsTableItem({
             {(
               product.price -
               (product.price * product.discountPercent) / 100
-            ).toFixed(2)}{" "}
+            ).toFixed(2)}{' '}
           </div>
           <div className="text-left line-through text-gray">
             {product.price}
@@ -98,12 +107,21 @@ export default function ProductsTableItem({
         </div>
       </td>
       <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-        <div className="font-medium text-left text-green-600">
-          {product.isAvailable ? "True" : "False"}
+        <div
+          className={`font-medium text-left  ${
+            isOnSale ? 'text-green-600' : 'text-yellow-600'
+          }`}
+        >
+          {isOnSale ? 'On sale' : 'Out of sale'}
         </div>
       </td>
       <td className="w-px px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-        <ProductActionMenu align="right" product={product} />
+        <ProductActionMenu
+          align="right"
+          product={product}
+          isOnSale={isOnSale}
+          onChangeIsSale={onChangeIsSale}
+        />
       </td>
     </tr>
   );

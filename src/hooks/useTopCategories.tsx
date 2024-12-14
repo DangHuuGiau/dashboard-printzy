@@ -1,5 +1,5 @@
-import analyticsService from "@/api/analytic";
-import { useState, useEffect } from "react";
+import analyticsService from '@/api/analytic';
+import { useState, useEffect } from 'react';
 
 interface TopCategoriesParams {
   [key: string]: any;
@@ -16,20 +16,23 @@ const useTopCategories = ({ startDate, endDate }: TopCategoriesParams) => {
       setError(null);
 
       try {
-        const response = await analyticsService.getTopCategories({
-          startDate,
-          endDate,
-        });
-        setTopCategoriesData(response?.data || {});
+        if (startDate && endDate) {
+          const response = await analyticsService.getTopCategories({
+            startDate,
+            endDate,
+          });
+
+          setTopCategoriesData(response?.data || {});
+        }
       } catch (err) {
-        setError("Failed to fetch top products.");
+        setError('Failed to fetch top products.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchTopCategories();
-  }, [startDate, startDate]);
+  }, [endDate, startDate]);
 
   return topCategoriesData;
 };

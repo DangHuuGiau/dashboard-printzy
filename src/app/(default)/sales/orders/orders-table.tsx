@@ -1,7 +1,9 @@
-"use client";
+'use client';
 
-import { useItemSelection } from "@/components/utils/use-item-selection";
-import OrdersTableItem from "./orders-table-item";
+import { useItemSelection } from '@/components/utils/use-item-selection';
+import OrdersTableItem from './orders-table-item';
+import UpdateOrdersModal from './update-modal';
+import { useState } from 'react';
 
 export default function OrdersTable({
   orders,
@@ -17,11 +19,15 @@ export default function OrdersTable({
     handleSelectAllChange,
   } = useItemSelection(orders);
 
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
+  const [updatingOrder, setUpdatingOrder] = useState<any>();
+
   return (
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          All Orders{" "}
+          All Orders{' '}
           <span className="font-medium text-gray-400 dark:text-gray-500">
             {total || 0}
           </span>
@@ -86,10 +92,17 @@ export default function OrdersTable({
                 order={order}
                 onCheckboxChange={handleCheckboxChange}
                 isSelected={selectedItems.includes(order.id)}
+                setUpdatingOrder={setUpdatingOrder}
+                setOpenUpdateModal={setOpenUpdateModal}
               />
             ))}
           </table>
         </div>
+        <UpdateOrdersModal
+          order={updatingOrder}
+          open={openUpdateModal}
+          onOpen={() => setOpenUpdateModal(!openUpdateModal)}
+        />
       </div>
     </div>
   );

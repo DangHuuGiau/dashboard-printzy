@@ -49,9 +49,14 @@ export default function NewProduct() {
 
     const combine = (index: number, currentVariant: any) => {
       if (index === options.length) {
+        const discountPriceVariant =
+          price - (price * (discountPercent || 0)) / 100;
         const variant = {
-          price: price || 0,
-          baseCost: price === 0 ? price : price - 5 || 0,
+          price: discountPriceVariant || 0,
+          baseCost:
+            discountPriceVariant === 0
+              ? discountPriceVariant
+              : discountPriceVariant - 50000 || 0,
           isAvailable: true,
           isInStock: true,
           sku: currentVariant

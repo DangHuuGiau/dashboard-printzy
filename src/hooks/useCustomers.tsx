@@ -5,7 +5,14 @@ interface UseCustomersParams {
   [key: string]: any;
 }
 
-const useCustomers = ({ limit, skip, name }: UseCustomersParams) => {
+const useCustomers = ({
+  limit,
+  skip,
+  keyword,
+  startDate,
+  endDate,
+  isActive,
+}: UseCustomersParams) => {
   const [customersData, setCustomersData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +27,15 @@ const useCustomers = ({ limit, skip, name }: UseCustomersParams) => {
 
         if (limit !== undefined) query.$limit = limit;
         if (skip !== undefined) query.$skip = skip;
-        if (name) query.name = { $iLike: `%${name}%` };
+        if (keyword) {
+          query.name = { $iLike: `%${keyword}%` };
+          query.email = { $iLike: `%${keyword}%` };
+        }
+        if (isActive !== undefined) query.isActive = isActive;
+
+        if (startDate && endDate) {
+          query.createdAt = { $btw: [startDate, endDate] };
+        }
 
         Object.keys(query).forEach((key) => {
           if (
@@ -42,7 +57,7 @@ const useCustomers = ({ limit, skip, name }: UseCustomersParams) => {
     };
 
     fetchCustomers();
-  }, [limit, skip, name]);
+  }, [limit, skip, keyword, startDate, endDate, isActive]);
 
   return customersData;
 };

@@ -1,11 +1,12 @@
-import employeesService from "@/api/employees";
-import { useState, useEffect } from "react";
+import employeesService from '@/api/employees';
+import { useState, useEffect } from 'react';
 
 interface UseEmployeesParams {
   [key: string]: any;
 }
 
-const useEmployees = ({ limit, skip, name }: UseEmployeesParams) => {
+const useEmployees = (params: UseEmployeesParams) => {
+  const { limit, skip, email, forceRefresh, isActive } = params;
   const [employeesData, setEmployeesData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,14 +21,15 @@ const useEmployees = ({ limit, skip, name }: UseEmployeesParams) => {
 
         if (limit !== undefined) query.$limit = limit;
         if (skip !== undefined) query.$skip = skip;
-        if (name) query.name = { $iLike: `%${name}%` };
-        query.role = "employee";
+        if (email) query.email = { $iLike: `%${email}%` };
+        if (isActive !== undefined) query.isActive = isActive;
+        query.role = 'employee';
 
         Object.keys(query).forEach((key) => {
           if (
             query[key] === null ||
             query[key] === undefined ||
-            query[key] === ""
+            query[key] === ''
           ) {
             delete query[key];
           }
@@ -36,14 +38,14 @@ const useEmployees = ({ limit, skip, name }: UseEmployeesParams) => {
         const response = await employeesService.getList(query);
         setEmployeesData(response?.data || {});
       } catch (err) {
-        setError("Failed to fetch employees.");
+        setError('Failed to fetch employees.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchEmployees();
-  }, [limit, skip, name]);
+  }, [limit, email, params, skip, forceRefresh, isActive]);
 
   return employeesData;
 };

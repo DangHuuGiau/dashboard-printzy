@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const customersStatus = [
-  { id: 1, name: "All", value: undefined },
-  { id: 2, name: "Active", value: true },
-  { id: 3, name: "Locked", value: false },
+  { id: 1, name: 'All', value: undefined },
+  { id: 2, name: 'Active', value: true },
+  { id: 3, name: 'Locked', value: false },
 ];
 
 interface Props {
@@ -17,17 +17,10 @@ export default function FilterCustomers({
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [inventoryStatus, setInventoryStatus] = useState<number>(1);
-  const [priceRange, setPriceRange] = useState<number>(0);
 
   const handleInventoryChange = (id: number, value: boolean | undefined) => {
     setInventoryStatus(id);
-    setFilterParams({ ...filterParams, isAvailable: value });
-  };
-
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const price = parseInt(e.target.value, 10);
-    setPriceRange(price);
-    setFilterParams({ ...filterParams, price: `0-${price}` });
+    setFilterParams({ ...filterParams, isActive: value });
   };
 
   const toggleDrawer = () => {
@@ -55,7 +48,7 @@ export default function FilterCustomers({
       {/* Drawer component */}
       <div
         className={`fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         } bg-white w-80 dark:bg-gray-800`}
       >
         <h5 className="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
@@ -87,20 +80,6 @@ export default function FilterCustomers({
         {/* Filter content */}
 
         <div className="space-y-4">
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-400">
-              Total spend: {`0-${priceRange}`}
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none dark:bg-gray-700"
-              value={priceRange}
-              onChange={handlePriceChange}
-            />
-          </div>
-
           <div className="">
             <ul className="mb-4 space-y-2 sm:flex sm:space-y-0 sm:space-x-2 lg:space-y-2 lg:space-x-0 lg:flex-col">
               <li>

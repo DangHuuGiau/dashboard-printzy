@@ -1,21 +1,32 @@
-"use client";
+'use client';
 
-import { SelectedItemsProvider } from "@/app/selected-items-context";
-import DeleteButton from "@/components/delete-button";
-import { useState } from "react";
-import ProductsPagination from "@/components/products/pagination";
-import FilterCustomers from "./filter-drawer";
-import EmployeesTable from "./employees-table";
-import useEmployees from "@/hooks/useEmployees";
+import { SelectedItemsProvider } from '@/app/selected-items-context';
+import DeleteButton from '@/components/delete-button';
+import { useState } from 'react';
+import ProductsPagination from '@/components/products/pagination';
+import EmployeesTable from './employees-table';
+import useEmployees from '@/hooks/useEmployees';
+import CreateEmployeeModal from './create-modal';
+import FilterEmployees from './filter-drawer';
 
 const LIMIT_PER_PAGE = 10;
 function EmployeesContent() {
   const [filterParams, setFilterParams] = useState<any>({
     limit: LIMIT_PER_PAGE,
     skip: 0,
+    forceRefresh: 0,
   });
 
   const employeesData = useEmployees(filterParams);
+
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  const handleEmployeeModified = () => {
+    setFilterParams((prev: any) => ({
+      ...prev,
+      forceRefresh: prev.forceRefresh + 1,
+    }));
+  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[96rem] mx-auto">
@@ -34,7 +45,7 @@ function EmployeesContent() {
           <DeleteButton />
 
           <div className="flex items-center gap-2">
-            <FilterCustomers
+            <FilterEmployees
               filterParams={filterParams}
               setFilterParams={setFilterParams}
             />
@@ -46,7 +57,7 @@ function EmployeesContent() {
                   type="search"
                   placeholder="Search name, email..."
                   onChange={(e) =>
-                    setFilterParams({ ...filterParams, name: e.target.value })
+                    setFilterParams({ ...filterParams, email: e.target.value })
                   }
                 />
                 <button
@@ -69,7 +80,10 @@ function EmployeesContent() {
             </div>
             <div className="m-1.5">
               {/* Start */}
-              <button className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
+              <button
+                className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
+                onClick={() => setCreateModalOpen(true)}
+              >
                 Add Employee
               </button>
               {/* End */}
@@ -94,6 +108,11 @@ function EmployeesContent() {
           }}
         />
       </div>
+      <CreateEmployeeModal
+        open={isCreateModalOpen}
+        onOpen={setCreateModalOpen}
+        onEmployeeCreated={handleEmployeeModified}
+      />
     </div>
   );
 }

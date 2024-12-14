@@ -1,33 +1,37 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Datepicker from "@/components/datepicker";
-import AnalyticsCard01 from "./analytics-card-01";
-import AnalyticsCard02 from "./analytics-card-02";
-import AnalyticsCard03 from "./analytics-card-03";
-import AnalyticsCard04 from "./analytics-card-04";
-import AnalyticsCard05 from "./analytics-card-05";
-import DashboardCard01 from "./dashboard-card-01";
-import DashboardCard02 from "./dashboard-card-02";
-import DashboardCard03 from "./dashboard-card-03";
-import useOrders from "@/hooks/useOrders";
-import useCustomers from "@/hooks/useCustomers";
-import useTopProducts from "@/hooks/useTopProducts";
-import useTopCategories from "@/hooks/useTopCategories";
-import useTopCollections from "@/hooks/useTopCollections";
-import useProductAnalytics from "@/hooks/useProductAnalytics";
+import { useEffect, useState } from 'react';
+import Datepicker from '@/components/datepicker';
+import AnalyticsCard01 from './analytics-card-01';
+import AnalyticsCard02 from './analytics-card-02';
+import AnalyticsCard03 from './analytics-card-03';
+import AnalyticsCard04 from './analytics-card-04';
+import AnalyticsCard05 from './analytics-card-05';
+import DashboardCard01 from './dashboard-card-01';
+import DashboardCard02 from './dashboard-card-02';
+import DashboardCard03 from './dashboard-card-03';
+import useOrders from '@/hooks/useOrders';
+import useCustomers from '@/hooks/useCustomers';
+import useTopProducts from '@/hooks/useTopProducts';
+import useTopCategories from '@/hooks/useTopCategories';
+import useTopCollections from '@/hooks/useTopCollections';
+import useProductAnalytics from '@/hooks/useProductAnalytics';
+import AnalyticsVnPayPayment from './analytics-vnpay';
+import customersService from '@/api/customers';
+import useOrderTotalByDateAnalytics from '@/hooks/useOrderTotalByDateAnalytics';
 
 export default function Analytics() {
+  const [totalUser, setTotalUser] = useState(0);
   const [dates, setDates] = useState<[Date | null, Date | null]>([
-    new Date(2024, 0, 1),
-    new Date(2024, 11, 31),
+    new Date(new Date().setDate(new Date().getDate() - 7)), // 7 days before today
+    new Date(),
   ]);
-
   const ordersData = useOrders({ startDate: dates[0], endDate: dates[1] });
   const customersData = useCustomers({
     startDate: dates[0],
     endDate: dates[1],
   });
+
   const topProductsData = useTopProducts({
     startDate: dates[0],
     endDate: dates[1],
@@ -41,6 +45,11 @@ export default function Analytics() {
     endDate: dates[1],
   });
   const productAnalyticsData = useProductAnalytics({
+    startDate: dates[0],
+    endDate: dates[1],
+  });
+
+  const orderTotalByDateAnalyticsData = useOrderTotalByDateAnalytics({
     startDate: dates[0],
     endDate: dates[1],
   });
@@ -65,6 +74,15 @@ export default function Analytics() {
       return totalProfit + profit;
     }, 0);
   }
+
+  const getTotalUser = async () => {
+    const response = await customersService.getList({});
+    setTotalUser(response?.data?.total || 0);
+    return;
+  };
+  useEffect(() => {
+    getTotalUser();
+  }, []);
 
   return (
     <div>
@@ -91,13 +109,14 @@ export default function Analytics() {
         <DashboardCard03 totalOrder={ordersData?.total} />
 
         <AnalyticsCard01
-          totalCustomers={customersData?.total}
+          totalCustomers={totalUser}
           newCustomers={customersData?.total}
-          totalSpend={totalCustomersSpend}
+          total={orderTotalByDateAnalyticsData}
         />
         <AnalyticsCard02 data={topProductsData} />
         <AnalyticsCard03 data={topCategoriesData} />
         <AnalyticsCard04 data={topCollectionsData} />
+        <AnalyticsVnPayPayment total={profit} />
         <AnalyticsCard05 data={productAnalyticsData} />
       </div>
     </div>

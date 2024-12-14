@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { SelectedItemsProvider } from "@/app/selected-items-context";
-import DeleteButton from "@/components/delete-button";
-import DateSelect from "@/components/date-select";
-import FilterButton from "@/components/dropdown-filter";
-import OrdersTable from "./orders-table";
+import { SelectedItemsProvider } from '@/app/selected-items-context';
+import DeleteButton from '@/components/delete-button';
+import OrdersTable from './orders-table';
 
-import { useState } from "react";
-import useOrders from "@/hooks/useOrders";
-import ProductsPagination from "../../../../components/products/pagination";
+import { useState } from 'react';
+import useOrders from '@/hooks/useOrders';
+import ProductsPagination from '../../../../components/products/pagination';
+import Datepicker from '@/components/datepicker';
+import FilterDrawer from './filter-drawer';
 
 const LIMIT_PER_PAGE = 10;
 function OrdersContent() {
@@ -16,8 +16,22 @@ function OrdersContent() {
     limit: LIMIT_PER_PAGE,
     skip: 0,
   });
+  const [activeStatus, setActiveStatus] = useState<string>('');
+  const [dates, setDates] = useState<[Date | null, Date | null]>([
+    new Date(new Date().setDate(new Date().getDate() - 7)), // 7 days before today
+    new Date(),
+  ]);
 
-  const ordersData = useOrders(filterParams);
+  const ordersData = useOrders({
+    ...filterParams,
+    status: activeStatus === 'All' ? '' : activeStatus.toLowerCase(),
+    startDate: dates[0],
+    endDate: dates[1],
+  });
+  const handleStatusChange = (status: string) => {
+    setActiveStatus(status);
+    setFilterParams({ ...filterParams, skip: 0 });
+  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-[96rem] mx-auto">
@@ -31,21 +45,54 @@ function OrdersContent() {
         <div className="grid justify-start grid-flow-col gap-2 sm:auto-cols-max sm:justify-end">
           <DeleteButton />
 
-          <DateSelect />
+          <div className="grid justify-start grid-flow-col gap-2 sm:auto-cols-max sm:justify-end">
+            <Datepicker
+              align="right"
+              onDateChange={(selectedDates: Date[]) => {
+                setDates([selectedDates[0], selectedDates[1] || null]);
+              }}
+            />
+            <FilterDrawer
+              filterParams={filterParams}
+              setFilterParams={setFilterParams}
+            />
+          </div>
+        </div>
+      </div>
 
-          <FilterButton align="right" />
-
-          <button className="text-gray-100 bg-gray-900 btn hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
-            <svg
-              className="fill-current shrink-0 xs:hidden"
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-            >
-              <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-            </svg>
-            <span className="max-xs:sr-only">Add Order</span>
-          </button>
+      <div className="mb-5 sm:flex sm:justify-between sm:items-center">
+        <div className="mb-4 sm:mb-0">
+          <ul className="flex flex-wrap -m-1">
+            {[
+              'All',
+              'Unpaid',
+              'Processing',
+              'Delivery',
+              'Completed',
+              'Cancelled',
+              'Refunded',
+            ].map((status) => (
+              <li key={status} className="m-1">
+                <button
+                  onClick={() => handleStatusChange(status)}
+                  className={`inline-flex items-center justify-center px-3 py-1 text-sm font-medium leading-5 transition rounded-full shadow-sm ${
+                    activeStatus === status
+                      ? 'text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-800'
+                      : 'text-gray-500 bg-white border border-gray-200 hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'
+                  }`}
+                >
+                  {status}{' '}
+                  {/* <span className="ml-1 text-gray-400 dark:text-gray-500">
+                      {status === 'All'
+                        ? invoicesData?.total
+                        : invoicesData?.data.filter(
+                            (item: any) => item.status === status
+                          ).length || 0}
+                    </span> */}
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 

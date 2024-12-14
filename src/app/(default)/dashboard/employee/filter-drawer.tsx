@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-const customersStatus = [
-  { id: 1, name: "All", value: undefined },
-  { id: 2, name: "Active", value: true },
-  { id: 3, name: "Locked", value: false },
+const employeeStatus = [
+  { id: 1, name: 'All', value: undefined },
+  { id: 2, name: 'Active', value: true },
+  { id: 3, name: 'Locked', value: false },
 ];
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
   setFilterParams: (filterParams: any) => void;
 }
 
-export default function FilterCustomers({
+export default function FilterEmployees({
   filterParams,
   setFilterParams,
 }: Props) {
@@ -20,7 +20,7 @@ export default function FilterCustomers({
 
   const handleStatusChange = (id: number, value: boolean | undefined) => {
     setInventoryStatus(id);
-    setFilterParams({ ...filterParams, isAvailable: value });
+    setFilterParams({ ...filterParams, isActive: value });
   };
 
   const toggleDrawer = () => {
@@ -48,7 +48,7 @@ export default function FilterCustomers({
       {/* Drawer component */}
       <div
         className={`fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         } bg-white w-80 dark:bg-gray-800`}
       >
         <h5 className="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
@@ -89,7 +89,7 @@ export default function FilterCustomers({
                       Status
                     </span>
                   </div>
-                  {customersStatus.map((status) => (
+                  {employeeStatus.map((status) => (
                     <div
                       className="text-sm"
                       key={`select-inventory-${status.value}`}

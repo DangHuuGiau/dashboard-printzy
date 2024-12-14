@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { SelectedItemsProvider } from "@/app/selected-items-context";
-import DeleteButton from "@/components/delete-button";
-import CustomersTable from "./customers-table";
-import { useState } from "react";
-import useCustomers from "@/hooks/useCustomers";
-import ProductsPagination from "@/components/products/pagination";
-import FilterCustomers from "./filter-drawer";
+import { SelectedItemsProvider } from '@/app/selected-items-context';
+import DeleteButton from '@/components/delete-button';
+import CustomersTable from './customers-table';
+import { useState } from 'react';
+import useCustomers from '@/hooks/useCustomers';
+import ProductsPagination from '@/components/products/pagination';
+import FilterCustomers from './filter-drawer';
 
 const LIMIT_PER_PAGE = 10;
 function CustomersContent() {

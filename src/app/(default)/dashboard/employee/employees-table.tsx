@@ -1,7 +1,9 @@
-"use client";
+'use client';
 
-import { useItemSelection } from "@/components/utils/use-item-selection";
-import OrdersTableItem from "./employees-table-item";
+import { useItemSelection } from '@/components/utils/use-item-selection';
+import OrdersTableItem from './employees-table-item';
+import UpdateEmployeeModal from './update-modal';
+import { useState } from 'react';
 
 export default function EmployeesTable({
   employees,
@@ -17,11 +19,14 @@ export default function EmployeesTable({
     handleSelectAllChange,
   } = useItemSelection(employees);
 
+  const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
+  const [updatingEmployee, setUpdatingEmployee] = useState<any>();
+
   return (
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          All Employees{" "}
+          All Employees{' '}
           <span className="font-medium text-gray-400 dark:text-gray-500">
             {total || 0}
           </span>
@@ -74,11 +79,19 @@ export default function EmployeesTable({
                 employee={employee}
                 onCheckboxChange={handleCheckboxChange}
                 isSelected={selectedItems.includes(employee.id)}
+                onOpen={setUpdateModalOpen}
+                setUpdatingEmployee={setUpdatingEmployee}
               />
             ))}
           </table>
         </div>
       </div>
+      <UpdateEmployeeModal
+        employee={updatingEmployee}
+        open={isUpdateModalOpen}
+        onOpen={setUpdateModalOpen}
+        onEmployeeUpdated={() => {}}
+      />
     </div>
   );
 }

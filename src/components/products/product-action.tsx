@@ -1,22 +1,29 @@
 'use client';
 
+import productsService from '@/api/products';
 import {
   Menu,
   MenuButton,
   MenuItems,
   MenuItem,
   Transition,
+  Button,
 } from '@headlessui/react';
 import Link from 'next/link';
+import { use, useState } from 'react';
 
 export default function ProductActionMenu({
   align,
   className = '',
   product,
+  isOnSale,
+  onChangeIsSale,
 }: React.HTMLAttributes<HTMLDivElement> & {
   align?: 'left' | 'right';
   className?: string;
   product: any;
+  isOnSale: boolean;
+  onChangeIsSale: () => void;
 }) {
   return (
     <Menu as="div" className={`relative inline-flex ${className}`}>
@@ -50,18 +57,16 @@ export default function ProductActionMenu({
           >
             <MenuItems as="ul" className="focus:outline-none">
               <MenuItem as="li">
-                {({ active }) => (
-                  <Link
-                    className={`font-medium text-sm flex py-1 px-3 ${
-                      active
-                        ? 'text-gray-800 dark:text-gray-200'
-                        : 'text-gray-600 dark:text-gray-300'
-                    }`}
-                    href="#0"
-                  >
-                    Hide from store
-                  </Link>
-                )}
+                <Button
+                  onClick={onChangeIsSale}
+                  className={`font-medium text-sm flex py-1 px-3 ${
+                    isOnSale
+                      ? 'text-gray-800 dark:text-gray-200'
+                      : 'text-gray-600 dark:text-gray-300'
+                  }`}
+                >
+                  {isOnSale ? 'Hide from store' : 'Go on sale'}
+                </Button>
               </MenuItem>
               <MenuItem as="li">
                 {({ active }) => (
@@ -76,13 +81,6 @@ export default function ProductActionMenu({
                     Edit
                   </Link>
                 )}
-              </MenuItem>
-              <MenuItem as="li">
-                <button
-                  className={`font-medium text-sm flex py-1 px-3 text-red-500`}
-                >
-                  Delete
-                </button>
               </MenuItem>
             </MenuItems>
           </Transition>

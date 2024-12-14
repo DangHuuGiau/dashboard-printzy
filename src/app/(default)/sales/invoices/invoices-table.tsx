@@ -1,14 +1,18 @@
-"use client";
+'use client';
 
-import { useItemSelection } from "@/components/utils/use-item-selection";
-import InvoicesTableItem from "./invoices-table-item";
+import { useItemSelection } from '@/components/utils/use-item-selection';
+import InvoicesTableItem from './invoices-table-item';
+import UpdateInvoicesModal from './update-modal';
+import { useState } from 'react';
 
 export default function InvoicesTable({
   invoices,
   total,
+  onModified,
 }: {
   invoices: any[];
   total: number;
+  onModified: () => void;
 }) {
   const {
     selectedItems,
@@ -17,11 +21,15 @@ export default function InvoicesTable({
     handleSelectAllChange,
   } = useItemSelection(invoices);
 
+  const [updatingInvoice, setUpdatingInvoice] = useState<any>();
+
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
   return (
     <div className="relative bg-white shadow-sm dark:bg-gray-800 rounded-xl">
       <header className="px-5 py-4">
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-          Invoices{" "}
+          Invoices{' '}
           <span className="font-medium text-gray-400 dark:text-gray-500">
             {total || 0}
           </span>
@@ -48,7 +56,10 @@ export default function InvoicesTable({
                   </div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Invoice</div>
+                  <div className="font-semibold text-left">Invoice Id</div>
+                </th>
+                <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+                  <div className="font-semibold text-left">Order Number</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <div className="font-semibold text-left">Total</div>
@@ -60,10 +71,10 @@ export default function InvoicesTable({
                   <div className="font-semibold text-left">Customer</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Paid on</div>
+                  <div className="font-semibold text-left">Created on</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="font-semibold text-left">Transaction Id</div>
+                  <div className="font-semibold text-left">Paid on</div>
                 </th>
                 <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                   <div className="font-semibold text-left">Type</div>
@@ -81,12 +92,20 @@ export default function InvoicesTable({
                   invoice={invoice}
                   onCheckboxChange={handleCheckboxChange}
                   isSelected={selectedItems.includes(invoice.id)}
+                  setUpdatingInvoice={setUpdatingInvoice}
+                  setOpenUpdateModal={setOpenUpdateModal}
                 />
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      <UpdateInvoicesModal
+        invoice={updatingInvoice}
+        open={openUpdateModal}
+        onOpen={() => setOpenUpdateModal(!openUpdateModal)}
+        onModified={() => onModified()}
+      />
     </div>
   );
 }

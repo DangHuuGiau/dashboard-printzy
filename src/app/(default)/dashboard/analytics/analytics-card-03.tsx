@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function AnalyticsCard03({ data }: { data: any[] }) {
   return (
@@ -48,7 +48,7 @@ export default function AnalyticsCard03({ data }: { data: any[] }) {
               className="text-sm font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-400"
               href="#0"
             >
-              Page Report -&gt;
+              Categories Report -&gt;
             </Link>
           </div>
         </div>

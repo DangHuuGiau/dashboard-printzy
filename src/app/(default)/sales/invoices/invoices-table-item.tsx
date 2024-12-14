@@ -1,25 +1,25 @@
-import { InvoicesProperties } from "./invoices-properties";
-import dayjs from "dayjs";
-import UpdateInvoicesModal from "./update-modal";
-import { useState } from "react";
-
+import { InvoicesProperties } from './invoices-properties';
+import dayjs from 'dayjs';
 interface InvoicesTableItemProps {
   invoice: any;
   onCheckboxChange: (id: number, checked: boolean) => void;
   isSelected: boolean;
+  setUpdatingInvoice: (invoice: any) => void;
+  setOpenUpdateModal: (open: boolean) => void;
 }
 
 export default function InvoicesTableItem({
   invoice,
   onCheckboxChange,
   isSelected,
+  setUpdatingInvoice,
+  setOpenUpdateModal,
 }: InvoicesTableItemProps) {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onCheckboxChange(invoice.id, e.target.checked);
   };
 
   const { totalColor, statusColor } = InvoicesProperties();
-  const [openUpdateModal, setUpdateModal] = useState(false);
 
   return (
     <>
@@ -38,7 +38,20 @@ export default function InvoicesTableItem({
           </div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="font-medium text-sky-600">#{invoice.id}</div>
+          <div
+            className={`font-medium ${
+              invoice.transactionId ? 'text-sky-600' : 'text-yellow-600'
+            }`}
+          >
+            {`${
+              invoice.transactionId
+                ? invoice.transactionId
+                : 'Waiting for payment'
+            }`}
+          </div>
+        </td>
+        <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+          <div className="font-medium">#{invoice.order.orderNumber}</div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
           <div className={`font-medium ${totalColor(invoice.status)}`}>
@@ -48,10 +61,10 @@ export default function InvoicesTableItem({
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
           <div
             className={`inline-flex font-medium rounded-full text-center px-2.5 py-0.5 ${statusColor(
-              "Paid"
+              invoice.status
             )}`}
           >
-            {"Paid"}
+            {invoice.status}
           </div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
@@ -60,15 +73,13 @@ export default function InvoicesTableItem({
           </div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div>{dayjs(invoice.createdAt).format("DD-MM-YYYY HH:mm")}</div>
+          <div>{dayjs(invoice.createdAt).format('DD-MM-YYYY HH:mm')}</div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="flex items-center">
-            <div>{invoice.transactionId}</div>
-          </div>
+          <div>{dayjs(invoice.updatedAt).format('DD-MM-YYYY HH:mm')}</div>
         </td>
         <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-          <div className="flex items-center">
+          <div className="flex items-center uppercase">
             <div>{invoice.order.payment.paymentMethod}</div>
           </div>
         </td>
@@ -77,7 +88,8 @@ export default function InvoicesTableItem({
             <button
               className="text-gray-400 rounded-full hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
               onClick={() => {
-                setUpdateModal(!openUpdateModal), console.log(123);
+                setUpdatingInvoice(invoice);
+                setOpenUpdateModal(true);
               }}
             >
               <span className="sr-only">Edit</span>
@@ -94,11 +106,6 @@ export default function InvoicesTableItem({
           </div>
         </td>
       </tr>
-      <UpdateInvoicesModal
-        invoice={invoice}
-        open={openUpdateModal}
-        onOpen={() => setUpdateModal(!openUpdateModal)}
-      />
     </>
   );
 }
