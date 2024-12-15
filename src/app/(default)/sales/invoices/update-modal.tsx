@@ -16,6 +16,7 @@ export default function UpdateInvoicesModal({
   onOpen: (open: boolean) => void;
   onModified: () => void;
 }) {
+  console.log(invoice);
   const [status, setStatus] = useState(invoice?.status || '');
   const [transactionId, setTransactionId] = useState(
     invoice?.transactionId || ''
@@ -25,7 +26,7 @@ export default function UpdateInvoicesModal({
   const onUpdate = async () => {
     try {
       setLoading(true);
-      await invoicesService.update(invoice?.id, { status });
+      await invoicesService.update(invoice?.id, { status, transactionId });
       onModified();
       toast.success('Invoice updated successfully!');
       onOpen(false);
