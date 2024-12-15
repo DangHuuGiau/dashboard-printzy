@@ -32,10 +32,20 @@ export const getList = async (productId: string) => {
   return res;
 };
 
+export const createCustomizeModel = async (productId: number, data: any) => {
+  const res = await axiosInstance({
+    method: 'POST',
+    url: `${SCHEMA.API_BASE}/products/${productId}/variants/create-customize-model`,
+    data,
+  });
+  return res;
+};
+
 const variantsService = {
   getList,
   create,
   update,
+  createCustomizeModel,
 };
 
 export default variantsService;

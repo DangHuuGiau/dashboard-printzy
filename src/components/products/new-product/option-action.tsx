@@ -7,7 +7,6 @@ import {
   MenuItem,
   Transition,
 } from '@headlessui/react';
-import Link from 'next/link';
 
 export default function OptionActionMenu({
   align,

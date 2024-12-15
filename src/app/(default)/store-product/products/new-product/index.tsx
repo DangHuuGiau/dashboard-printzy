@@ -38,6 +38,7 @@ export default function NewProduct() {
   const [collectionId, setCollectionId] = useState<number | null>(null);
   const [trackingVariant, setTrackingVariant] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
+  const [customizeModel, setCustomizeModel] = useState('');
 
   const [images, setImages] = useState<File[]>([]);
 
@@ -67,7 +68,7 @@ export default function NewProduct() {
             optionId: optionValue.optionId,
             valueId: optionValue.optionValueId.id,
           })),
-          customizeModel: '',
+          customizeModelId: null,
         };
         variants.push(variant);
         return;
@@ -152,12 +153,21 @@ export default function NewProduct() {
 
       for (const variant of variants) {
         if (variant?.image) {
+          // Wait for 3 seconds before proceeding with the next upload
+          await new Promise((resolve) => setTimeout(resolve, 3000)); // 3000ms = 3 seconds
           const result = await uploadsService.uploadFile(variant.image);
           variantImageUploadResults.push(result);
         } else {
           variantImageUploadResults.push({ id: null });
         }
       }
+
+      const customizeModelData = await variantsService.createCustomizeModel(
+        productId,
+        {
+          customizeModel: customizeModel ? JSON.parse(customizeModel) : null,
+        }
+      );
 
       const variantsData = variants.map((variant, index) => ({
         price: variant.price,
@@ -167,8 +177,8 @@ export default function NewProduct() {
         isInStock: variant.isInStock,
         uploadId: variantImageUploadResults[index].id,
         optionValues: variant.optionValues,
-        customizeModel: variant.customizeModel
-          ? JSON.parse(variant.customizeModel)
+        customizeModelId: customizeModelData?.data
+          ? customizeModelData?.data?.id
           : null,
       }));
 
@@ -488,6 +498,22 @@ export default function NewProduct() {
                 )}
               </div>
             )}
+
+            <div>
+              <h2 className="mb-6 text-2xl font-bold text-gray-800 dark:text-gray-100">
+                Design Model
+              </h2>
+              <div className="">
+                <div className="m-1.5">
+                  {/* Start */}
+                  <textarea
+                    className="w-full rounded-md resize"
+                    value={customizeModel}
+                    onChange={(e) => setCustomizeModel(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

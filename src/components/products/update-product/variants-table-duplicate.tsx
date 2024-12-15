@@ -56,9 +56,6 @@ const VariantsTable = (props: Props) => {
               <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
                 <span className="font-semibold text-left">Visibility</span>
               </th>
-              <th className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                <span className="font-semibold text-left">Customize JSON</span>
-              </th>
             </tr>
           </thead>
           {/* Table body */}
@@ -116,21 +113,6 @@ const VariantsTable = (props: Props) => {
                         ></path>
                       </svg>
                     )}
-                  </div>
-                </td>
-                <td className="px-2 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
-                  <div className="text-left">
-                    <div className="mt-2">
-                      <textarea
-                        className="rounded-md resize"
-                        value={
-                          variant?.customizeModel
-                            ? JSON.stringify(variant.customizeModel, null, 2)
-                            : ''
-                        }
-                        // onChange={(e) => handleTextareaChange(e, groupKey)}
-                      />
-                    </div>
                   </div>
                 </td>
               </tr>
